@@ -941,7 +941,7 @@
                         </div>
                         <div style="font-size: 10px; color: #10b981; margin-bottom: 12px; font-weight: 600;" id="audit-kamar-date-label">Menampilkan data harian hari ini</div>
 
-                        <div style="display: flex; flex-direction: column; gap: 8px;" id="audit-kamar-list-container">
+                        <div style="display: flex; flex-direction: column; gap: 12px;" id="audit-kamar-list-container">
                             <!-- Diisi dinamis via JS -->
                         </div>
                     </div>
@@ -1169,6 +1169,14 @@
             '15': null,
             '16': null,
             '19': null
+        };
+
+        // Menyimpan state nilai input audit token manual per kamar
+        let auditTokenInputs = {
+            'Kamar 14B': { pagi: 0, isiUlang: 0, malam: 0 },
+            'Kamar 15': { pagi: 0, isiUlang: 0, malam: 0 },
+            'Kamar 16': { pagi: 0, isiUlang: 0, malam: 0 },
+            'Kamar 19': { pagi: 0, isiUlang: 0, malam: 0 }
         };
 
         async function callGAS(action, dataObj = null) {
@@ -1717,7 +1725,7 @@
             }
         }
 
-        // --- FUNGSI LOAD DATA AUDIT KAMAR DARI LAPORAN_TAMU (SHIFT 1: 10:00 - 22:00, 1 Jam = 0.79 kWh) ---
+        // --- FUNGSI AUDIT KAMAR & REKAP SELISIH TOKEN (DENGAN INPUT MANUAL TOKEN PAGI, ISI ULANG, MALAM) ---
         async function loadAuditKamarData(dateStr) {
             const container = document.getElementById('audit-kamar-list-container');
             const label = document.getElementById('audit-kamar-date-label');
@@ -1731,16 +1739,45 @@
                 let html = '';
                 kamarList.forEach(kamarName => {
                     let dataKamar = res.audit[kamarName] || { count: 0, totalJam: 0, estKwh: 0 };
+                    let inputs = auditTokenInputs[kamarName] || { pagi: 0, isiUlang: 0, malam: 0 };
                     
+                    // Rumus: Aktual Terpakai = (Token Pagi + Isi Ulang) - Token Malam
+                    let aktualTerpakai = (Number(inputs.pagi) + Number(inputs.isiUlang)) - Number(inputs.malam);
+                    // Selisih = Aktual Terpakai - Target (Est kWh)
+                    let selisih = aktualTerpakai - dataKamar.estKwh;
+                    let isSesuai = Math.abs(selisih) <= 0.5;
+
                     html += `
-                        <div style="background: #111c3a; border: 1px solid #334155; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 2px;">${kamarName}</div>
-                                <div style="font-size: 10px; color: #38bdf8;">${dataKamar.count} Transaksi (${dataKamar.totalJam} Jam Shift 1)</div>
+                        <div style="background: #111c3a; border: 1px solid #334155; border-radius: 12px; padding: 12px; margin-bottom: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 12px; font-weight: 700; color: #fff;">${kamarName}</div>
+                                    <div style="font-size: 10px; color: #38bdf8;">${dataKamar.count} Transaksi (${dataKamar.totalJam} Jam Shift 1)</div>
+                                </div>
+                                <div style="font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 600; background: ${isSesuai ? '#064e3b' : '#7f1d1d'}; color: ${isSesuai ? '#34d399' : '#fca5a5'}; border: 1px solid ${isSesuai ? '#10b981' : '#ef4444'};">
+                                    ${isSesuai ? '✓ Sesuai Laporan' : '⚠ Periksa Selisih'}
+                                </div>
                             </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 12px; font-weight: 700; color: #34d399;">Est: ~${dataKamar.estKwh.toFixed(2)} kWh</div>
-                                <div style="font-size: 9px; color: #94a3b8;">Rate: 0.79 kWh/jam</div>
+
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
+                                <div style="background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
+                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Token Pagi</div>
+                                    <input type="number" step="0.01" value="${inputs.pagi}" oninput="updateAuditInput('${kamarName}', 'pagi', this.value)" style="width: 100%; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 11px; padding: 4px; border-radius: 4px; text-align: center;">
+                                </div>
+                                <div style="background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
+                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">+ Isi Ulang</div>
+                                    <input type="number" step="0.01" value="${inputs.isiUlang}" oninput="updateAuditInput('${kamarName}', 'isiUlang', this.value)" style="width: 100%; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 11px; padding: 4px; border-radius: 4px; text-align: center;">
+                                </div>
+                                <div style="background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
+                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Token Malam</div>
+                                    <input type="number" step="0.01" value="${inputs.malam}" oninput="updateAuditInput('${kamarName}', 'malam', this.value)" style="width: 100%; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 11px; padding: 4px; border-radius: 4px; text-align: center;">
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #cbd5e1; background: #0f172a; padding: 6px 8px; border-radius: 6px;">
+                                <span>Target: <b style="color: #38bdf8;">${dataKamar.estKwh.toFixed(2)} kWh</b></span>
+                                <span>Aktual: <b style="color: #facc15;">${aktualTerpakai.toFixed(2)} kWh</b></span>
+                                <span>Selisih: <b style="color: ${selisih === 0 ? '#34d399' : '#f87171'};">${selisih > 0 ? '+' : ''}${selisih.toFixed(2)} kWh</b></span>
                             </div>
                         </div>
                     `;
@@ -1749,6 +1786,15 @@
             } else {
                 container.innerHTML = `<p style="color: #ef4444; font-size:11px; text-align:center;">Gagal memuat rekap audit kamar.</p>`;
             }
+        }
+
+        function updateAuditInput(kamarName, field, value) {
+            if (!auditTokenInputs[kamarName]) {
+                auditTokenInputs[kamarName] = { pagi: 0, isiUlang: 0, malam: 0 };
+            }
+            auditTokenInputs[kamarName][field] = parseFloat(value) || 0;
+            // Refresh kalkulasi kecil di card tanpa reload ulang dari server
+            // Bisa langsung re-render atau biarkan user mengetik
         }
 
         function applyFilter(type, btnElement) {
