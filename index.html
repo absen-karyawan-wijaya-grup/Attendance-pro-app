@@ -302,20 +302,82 @@
         }
 
         .token-item h4 {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #38bdf8;
             margin-bottom: 6px;
         }
 
-        .token-preview-img {
+        /* Styling Kotak Preview Token Profesional & Border Berdenyut Hijau jika sudah foto */
+        .token-preview-box {
             width: 100%;
-            height: 75px;
-            border-radius: 6px;
+            height: 80px;
+            border-radius: 8px;
+            border: 2px dashed #475569;
+            background: #111c3a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .token-preview-box:hover {
+            border-color: #38bdf8;
+        }
+
+        /* Animasi Border Berdenyut Hijau ketika Foto Sudah Terisi */
+        .token-preview-box.has-photo {
+            border: 2px solid #10b981;
+            animation: pulseGreenGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseGreenGlow {
+            0% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.4); border-color: #10b981; }
+            50% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.9); border-color: #34d399; }
+            100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.4); border-color: #10b981; }
+        }
+
+        .token-preview-box img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border: 1px dashed #475569;
-            background: #1e293b;
-            margin-bottom: 6px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .token-placeholder-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        .token-placeholder-content i {
+            font-size: 18px;
+            color: #38bdf8;
+        }
+
+        .token-badge-success {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(6, 78, 59, 0.9);
+            color: #34d399;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 5;
+            border: 1px solid #10b981;
         }
 
         .btn-token-capture {
@@ -323,11 +385,15 @@
             color: #fff;
             border: none;
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 7px 10px;
             font-size: 10px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .action-grid {
@@ -388,6 +454,29 @@
         }
         .custom-modal-box {
             background: #111c3a; border: 2px solid #38bdf8; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        /* Action Sheet Pilihan Kamera / Timemark */
+        .action-sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 20000; padding: 0;
+        }
+        .action-sheet-card {
+            background: #111c3a; border-top: 1px solid #334155; border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; text-align: center; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Modal Fullscreen Preview Gambar Token */
+        .image-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 15px;
+        }
+        .image-modal-content {
+            position: relative; max-width: 100%; max-height: 90vh; text-align: center;
+        }
+        .image-modal-content img {
+            max-width: 100%; max-height: 80vh; border-radius: 10px; border: 2px solid #38bdf8; object-fit: contain;
         }
 
         .bottom-nav {
@@ -549,36 +638,8 @@
                     <span class="location-value" id="gps-coords-text">LOCATION FOUND</span>
                 </div>
 
-                <!-- WAJIB FOTO TOKEN LISTRIK -->
-                <div class="token-section-box">
-                    <h4 style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;"><i class="fa-solid fa-bolt text-yellow-400"></i> Wajib Foto Token Listrik</h4>
-                    <p style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;">Ambil foto meteran token asli secara real-time untuk keempat kamar berikut:</p>
-                    
-                    <div class="token-grid">
-                        <div class="token-item">
-                            <h4>Kamar 14B</h4>
-                            <img id="preview-14b" class="token-preview-img" src="" alt="Belum ada foto">
-                            <button class="btn-token-capture" onclick="captureTokenPhoto('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
-                        </div>
-                        <div class="token-item">
-                            <h4>Kamar 15</h4>
-                            <img id="preview-15" class="token-preview-img" src="" alt="Belum ada foto">
-                            <button class="btn-token-capture" onclick="captureTokenPhoto('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
-                        </div>
-                        <div class="token-item">
-                            <h4>Kamar 16</h4>
-                            <img id="preview-16" class="token-preview-img" src="" alt="Belum ada foto">
-                            <button class="btn-token-capture" onclick="captureTokenPhoto('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
-                        </div>
-                        <div class="token-item">
-                            <h4>Kamar 19</h4>
-                            <img id="preview-19" class="token-preview-img" src="" alt="Belum ada foto">
-                            <button class="btn-token-capture" onclick="captureTokenPhoto('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="action-grid">
+                <!-- TOMBOL ABSEN MASUK & PULANG DI ATAS -->
+                <div class="action-grid" style="margin-bottom: 15px;">
                     <button class="btn-absen btn-absen-masuk" onclick="submitAbsen('MASUK')">
                         <i class="fa-solid fa-right-to-bracket"></i> Absen Masuk
                     </button>
@@ -586,6 +647,63 @@
                         <i class="fa-solid fa-right-from-bracket"></i> Absen Pulang
                     </button>
                 </div>
+
+                <!-- WAJIB FOTO TOKEN LISTRIK DENGAN LABEL TOKEN KAMAR & INDIKATOR BERDENYUT HIJAU -->
+                <div class="token-section-box">
+                    <h4 style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;"><i class="fa-solid fa-bolt text-yellow-400"></i> Wajib Foto Token Listrik</h4>
+                    <p style="font-size: 10px; color: #38bdf8; margin-bottom: 2px; font-weight: 600;">⚡ Wajib foto token pagi sebelum absen masuk</p>
+                    <p style="font-size: 10px; color: #f87171; margin-bottom: 10px; font-weight: 600;">⚡ Wajib foto token malam sebelum absen pulang</p>
+                    
+                    <div class="token-grid">
+                        <div class="token-item">
+                            <h4>Token Kamar 14B</h4>
+                            <div id="box-preview-14b" class="token-preview-box" onclick="openTokenActionSheet('14B')">
+                                <div id="placeholder-14b" class="token-placeholder-content">
+                                    <i class="fa-solid fa-camera-retro"></i>
+                                    <span>Ketuk untuk foto</span>
+                                </div>
+                                <img id="preview-img-14b" class="hidden" src="" alt="Token 14B" onclick="openFullscreenImage(this.src)">
+                            </div>
+                            <button class="btn-token-capture" onclick="openTokenActionSheet('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
+                        </div>
+                        <div class="token-item">
+                            <h4>Token Kamar 15</h4>
+                            <div id="box-preview-15" class="token-preview-box" onclick="openTokenActionSheet('15')">
+                                <div id="placeholder-15" class="token-placeholder-content">
+                                    <i class="fa-solid fa-camera-retro"></i>
+                                    <span>Ketuk untuk foto</span>
+                                </div>
+                                <img id="preview-img-15" class="hidden" src="" alt="Token 15" onclick="openFullscreenImage(this.src)">
+                            </div>
+                            <button class="btn-token-capture" onclick="openTokenActionSheet('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
+                        </div>
+                        <div class="token-item">
+                            <h4>Token Kamar 16</h4>
+                            <div id="box-preview-16" class="token-preview-box" onclick="openTokenActionSheet('16')">
+                                <div id="placeholder-16" class="token-placeholder-content">
+                                    <i class="fa-solid fa-camera-retro"></i>
+                                    <span>Ketuk untuk foto</span>
+                                </div>
+                                <img id="preview-img-16" class="hidden" src="" alt="Token 16" onclick="openFullscreenImage(this.src)">
+                            </div>
+                            <button class="btn-token-capture" onclick="openTokenActionSheet('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
+                        </div>
+                        <div class="token-item">
+                            <h4>Token Kamar 19</h4>
+                            <div id="box-preview-19" class="token-preview-box" onclick="openTokenActionSheet('19')">
+                                <div id="placeholder-19" class="token-placeholder-content">
+                                    <i class="fa-solid fa-camera-retro"></i>
+                                    <span>Ketuk untuk foto</span>
+                                </div>
+                                <img id="preview-img-19" class="hidden" src="" alt="Token 19" onclick="openFullscreenImage(this.src)">
+                            </div>
+                            <button class="btn-token-capture" onclick="openTokenActionSheet('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden file input untuk direct camera capture -->
+                <input type="file" id="hidden-token-input" accept="image/*" capture="environment" class="hidden" onchange="handleTokenFileSelected(event)">
 
                 <div id="absen-status" class="status-msg hidden"></div>
             </div>
@@ -786,7 +904,7 @@
 
                     <div id="email-status" class="status-msg hidden"></div>
 
-                    <!-- CARD BARU: PREVIEW FOTO TOKEN LISTRIK (RIWAYAT 30 HARI) -->
+                    <!-- CARD PREVIEW FOTO TOKEN LISTRIK (RIWAYAT 30 HARI) DENGAN FULL-SCREEN KLIK -->
                     <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="font-size: 13px; color: #38bdf8;"><i class="fa-solid fa-bolt"></i> Preview Foto Token Listrik (30 Hari)</h3>
@@ -946,9 +1064,37 @@
         </div>
     </div>
 
+    <!-- ACTION SHEET PILIHAN KAMERA / TIMEMARK -->
+    <div id="token-action-sheet" class="action-sheet-overlay hidden" onclick="closeTokenActionSheet()">
+        <div class="action-sheet-card" onclick="event.stopPropagation()">
+            <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 14px;" id="sheet-title">Foto Token Kamar</h3>
+            <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 16px;">
+                <button class="btn" style="flex: 1; background: #2563eb; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px;" onclick="triggerDirectCamera()">
+                    <i class="fa-solid fa-camera" style="font-size: 20px;"></i>
+                    <span style="font-size: 11px;">Kamera Bawaan</span>
+                </button>
+                <button class="btn" style="flex: 1; background: #059669; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px;" onclick="openTimemarkApp()">
+                    <i class="fa-solid fa-clock" style="font-size: 20px;"></i>
+                    <span style="font-size: 11px;">Timemark App</span>
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="closeTokenActionSheet()" style="padding: 10px;">Batal</button>
+        </div>
+    </div>
+
+    <!-- MODAL FULL-SCREEN PREVIEW GAMBAR -->
+    <div id="image-fullscreen-modal" class="image-modal-overlay hidden" onclick="closeImageModal()">
+        <div class="image-modal-content" onclick="event.stopPropagation()">
+            <img id="fullscreen-img-element" src="" alt="Full Preview">
+            <div style="margin-top: 15px;">
+                <button class="btn" onclick="closeImageModal()" style="background: #ef4444; width: auto; padding: 8px 20px;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynqW26D1FDxbNmv3bHgXL4cV_egclylnJ-LVHT1tk0s8VizI6luEEJ4W34_47mRithKA/exec'; // Ganti dengan URL deployment Web App GAS Anda
+        const SCRIPT_URL = 'URL_WEB_APP_GAS_ANDA_DISINI'; // Ganti dengan URL deployment Web App GAS Anda
 
         const TARGET_LAT = -6.716420;
         const TARGET_LNG = 108.536437;
@@ -964,6 +1110,7 @@
         let globalHistoryData = [];
         let appNotifications = JSON.parse(localStorage.getItem('app_notifications') || '[]');
         let allowForcePulang = false;
+        let activeKamarTarget = null;
 
         // Penyimpanan data foto token lokal sesi berjalan
         let tokenPhotos = {
@@ -1025,6 +1172,40 @@
         }
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
+
+        // Fungsi Action Sheet Pilihan Kamera / Timemark
+        function openTokenActionSheet(kamar) {
+            activeKamarTarget = kamar;
+            document.getElementById('sheet-title').innerText = `Foto Token Kamar ${kamar}`;
+            document.getElementById('token-action-sheet').classList.remove('hidden');
+        }
+
+        function closeTokenActionSheet() {
+            document.getElementById('token-action-sheet').classList.add('hidden');
+        }
+
+        function triggerDirectCamera() {
+            closeTokenActionSheet();
+            document.getElementById('hidden-token-input').click();
+        }
+
+        function openTimemarkApp() {
+            closeTokenActionSheet();
+            window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.jeylab.timemark;end;";
+        }
+
+        // Fungsi Fullscreen Preview Gambar Token
+        function openFullscreenImage(imgUrl) {
+            if (!imgUrl || imgUrl === "-") return;
+            const modal = document.getElementById('image-fullscreen-modal');
+            const imgEl = document.getElementById('fullscreen-img-element');
+            imgEl.src = imgUrl;
+            modal.classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-fullscreen-modal').classList.add('hidden');
+        }
 
         function addNotification(title, message, time, status) {
             const notif = { title, message, time, status, date: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) };
@@ -1151,48 +1332,68 @@
             }).catch(err => alert("Akses kamera ditolak atau diblokir."));
         }
 
-        // Fungsi khusus ambil foto Token secara real-time dari kamera aktif
-        function captureTokenPhoto(kamarNum) {
-            if (!videoStream) {
-                alert("Kamera belum aktif! Silakan aktifkan kamera terlebih dahulu.");
-                initCamera();
-                return;
-            }
-            const video = document.getElementById('webcam');
-            const canvas = document.createElement('canvas');
-            const maxWidth = 480;
-            const scale = maxWidth / (video.videoWidth || 640);
-            canvas.width = maxWidth;
-            canvas.height = (video.videoHeight || 640) * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // Handler Tangkap File dari Kamera Bawaan dengan Indikator Berdenyut Hijau
+        function handleTokenFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file || !activeKamarTarget) return;
 
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
+            const kamarNum = activeKamarTarget;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxWidth = 960;
+                    const scale = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-            ctx.fillRect(12, canvas.height - 50, canvas.width - 24, 42);
-            ctx.fillStyle = "#38bdf8";
-            ctx.fillRect(12, canvas.height - 50, 4, 42);
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 10px Inter, Arial, sans-serif";
-            ctx.fillText(`⚡ TOKEN KAMAR ${kamarNum} ${coordsStr}`, 20, canvas.height - 32);
-            ctx.fillStyle = "#cbd5e1";
-            ctx.font = "9px Inter, Arial, sans-serif";
-            ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 20, canvas.height - 14);
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-            tokenPhotos[kamarNum] = dataUrl;
+                    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+                    ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
+                    ctx.fillStyle = "#38bdf8";
+                    ctx.fillRect(12, canvas.height - 55, 4, 45);
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 12px Inter, Arial, sans-serif";
+                    ctx.fillText(`⚡ TOKEN KAMAR ${kamarNum} ${coordsStr}`, 22, canvas.height - 33);
+                    ctx.fillStyle = "#cbd5e1";
+                    ctx.font = "11px Inter, Arial, sans-serif";
+                    ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
 
-            // Update preview card UI
-            const previewEl = document.getElementById(`preview-${kamarNum.toLowerCase()}`);
-            if (previewEl) {
-                previewEl.src = dataUrl;
-            }
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    tokenPhotos[kamarNum] = compressedDataUrl;
+
+                    // Update UI Kotak Preview menjadi Border Berdenyut Hijau
+                    const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
+                    const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
+                    const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
+
+                    if (boxEl && placeholderEl && imgEl) {
+                        boxEl.classList.add('has-photo');
+                        placeholderEl.classList.add('hidden');
+                        imgEl.src = compressedDataUrl;
+                        imgEl.classList.remove('hidden');
+
+                        // Tambahkan badge sukses jika belum ada
+                        if (!boxEl.querySelector('.token-badge-success')) {
+                            const badge = document.createElement('div');
+                            badge.className = 'token-badge-success';
+                            badge.innerHTML = '✓ Selesai';
+                            boxEl.appendChild(badge);
+                        }
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = ''; // Reset input
         }
 
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
@@ -1278,7 +1479,7 @@
         function capturePhotoWithWatermark() {
             const video = document.getElementById('webcam');
             const canvas = document.createElement('canvas');
-            const maxWidth = 480;
+            const maxWidth = 720;
             const scale = maxWidth / (video.videoWidth || 640);
             canvas.width = maxWidth;
             canvas.height = (video.videoHeight || 640) * scale;
@@ -1302,7 +1503,7 @@
             ctx.fillStyle = "#cbd5e1";
             ctx.font = "9px Inter, Arial, sans-serif";
             ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 20, canvas.height - 14);
-            return canvas.toDataURL('image/jpeg', 0.6);
+            return canvas.toDataURL('image/jpeg', 0.75);
         }
 
         function selectIzinCategory(type, element) {
@@ -1420,7 +1621,7 @@
             const label = document.getElementById('token-history-date-label');
             container.innerHTML = `<p style="color: #64748b; font-size:11px; text-align:center; grid-column: span 2;">Memuat foto token...</p>`;
             
-            const res = await callGAS('getTokenHistoryByDate', { targetDate: dateStr });
+            const res = await callGAS('getTokenHistoryByDate', { targetDateStr: dateStr });
             if (res && res.success) {
                 label.innerText = `Menampilkan data tanggal: ${res.displayDate}`;
                 const tokens = res.tokens || {};
@@ -1428,17 +1629,20 @@
                 let html = '';
                 ['14B', '15', '16', '19'].forEach(kamar => {
                     let item = tokens[kamar] || { pagi: null, malam: null };
+                    let pagiUrl = getDriveDirectUrl(item.pagi);
+                    let malamUrl = getDriveDirectUrl(item.malam);
+
                     html += `
                         <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px;">
-                            <div style="font-size: 11px; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">Kamar ${kamar}</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">Token Kamar ${kamar}</div>
                             <div style="display: flex; gap: 6px;">
                                 <div style="flex: 1; text-align: center;">
                                     <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Pagi</div>
-                                    ${item.pagi ? `<a href="${item.pagi}" target="_blank"><img src="${item.pagi}" style="width: 1005; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #475569;"></a>` : '<span style="font-size: 8px; color: #64748b;">-</span>'}
+                                    ${pagiUrl ? `<img src="${pagiUrl}" onclick="openFullscreenImage('${pagiUrl}')" style="width: 100%; height: 65px; object-fit: cover; border-radius: 4px; border: 1px solid #475569; cursor: pointer;" title="Klik perbesar">` : '<span style="font-size: 9px; color: #64748b;">-</span>'}
                                 </div>
                                 <div style="flex: 1; text-align: center;">
                                     <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Malam</div>
-                                    ${item.malam ? `<a href="${item.malam}" target="_blank"><img src="${item.malam}" style="width: 100%; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #475569;"></a>` : '<span style="font-size: 8px; color: #64748b;">-</span>'}
+                                    ${malamUrl ? `<img src="${malamUrl}" onclick="openFullscreenImage('${malamUrl}')" style="width: 100%; height: 65px; object-fit: cover; border-radius: 4px; border: 1px solid #475569; cursor: pointer;" title="Klik perbesar">` : '<span style="font-size: 9px; color: #64748b;">-</span>'}
                                 </div>
                             </div>
                         </div>
