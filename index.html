@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Andara Wijaya Pro</title>
+    
+    <!-- Logo & PWA Meta Tag -->
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1qX5RAJgU8VuEBgEGLsga6oKZLvbde8AZ">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1qX5RAJgU8VuEBgEGLsga6oKZLvbde8AZ">
+    <meta property="og:title" content="ABSENSI KERJA - Wijaya Grup" />
+    <meta property="og:description" content="ABSENSI PRO." />
+    <meta property="og:image" content="https://lh3.googleusercontent.com/d/1qX5RAJgU8VuEBgEGLsga6oKZLvbde8AZ" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas untuk unduh gambar JPG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-neon: #60a5fa;
+            --bg: #0b1329;
+            --card-bg: #111c3a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: #0f172a;
+            position: relative;
+            padding: 20px 20px 90px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar Header */
+        .app-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+            position: relative;
+        }
+
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+            font-size: 18px;
+            overflow: hidden;
+        }
+        
+        .avatar-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-meta h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .user-meta p {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #334155;
+            color: #fff;
+        }
+
+        /* Live Digital Clock (24 Jam) */
+        .clock-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .clock-time {
+            font-size: 42px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .clock-date {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* Circular Face Scanning Area */
+        .face-scan-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .circular-camera-container {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            position: relative;
+            padding: 8px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.25);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .circular-camera-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            background: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circular-camera-inner video, .circular-camera-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .camera-fallback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            text-align: center;
+            z-index: 25;
+            border-radius: 50%;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+            box-shadow: 0 0 10px #38bdf8;
+            animation: scanAnimation 2.5s infinite ease-in-out;
+            z-index: 10;
+        }
+
+        @keyframes scanAnimation {
+            0% { top: 0%; opacity: 0.3; }
+            50% { top: 95%; opacity: 1; }
+            100% { top: 0%; opacity: 0.3; }
+        }
+
+        .gps-status-badge {
+            margin-top: -14px;
+            z-index: 20;
+            background: #022c22;
+            border: 1px solid #10b981;
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .gps-status-badge.out-of-range {
+            background: #450a0a;
+            border-color: #ef4444;
+            color: #fca5a5;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .scan-instruction {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .location-info-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+
+        .location-label {
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .location-value {
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        /* Token Listrik Section */
+        .token-section-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 15px;
+        }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .token-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .token-item h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 6px;
+        }
+
+        .token-preview-img {
+            width: 100%;
+            height: 75px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px dashed #475569;
+            background: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .btn-token-capture {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .btn-absen {
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #ffffff;
+        }
+
+        .btn-absen:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-absen-masuk { background: #2563eb; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .btn-absen-pulang { background: #dc2626; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
+
+        .card {
+            background: #1e293b;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 12px; color: #cbd5e1; font-weight: 600; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px; }
+        .input-wrapper input, .input-wrapper select, .input-wrapper textarea {
+            width: 100%; padding: 12px 14px 12px 42px; border: 1px solid #334155; border-radius: 12px; font-size: 13px; color: #ffffff; background: #0f172a; outline: none;
+        }
+
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 12px; background-color: var(--primary); color: white; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-secondary { background-color: #334155; color: #f8fafc; }
+        .hidden { display: none !important; }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); border-color: #38bdf8; }
+            50% { box-shadow: 0 0 35px rgba(56, 189, 248, 0.9); border-color: #60a5fa; }
+            100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); border-color: #38bdf8; }
+        }
+
+        .custom-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 19, 41, 0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
+        }
+        .custom-modal-box {
+            background: #111c3a; border: 2px solid #38bdf8; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #64748b; cursor: pointer; flex: 1; }
+        .nav-item i { font-size: 18px; }
+        .nav-item.active { color: #38bdf8; font-weight: 700; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-card { background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 12px; display: flex; align-items: center; gap: 10px; }
+        .stat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .stat-info .title { font-size: 10px; color: #64748b; }
+        .stat-info .value { font-size: 14px; font-weight: 700; color: #fff; }
+
+        .notif-card-item {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            position: relative;
+            touch-action: pan-y;
+            user-select: none;
+            overflow: hidden;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        
+        .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
+        .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #334155; background: #0f172a; color: #94a3b8; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .filter-btn.active { background: #3b82f6; color: #fff; border-color: #60a5fa; }
+        .filter-summary { font-size: 11px; color: #38bdf8; background: #1e293b; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #334155; }
+        
+        .history-table-container { width: 100%; overflow-x: auto; border: 1px solid #334155; border-radius: 12px; background: #0f172a; }
+        .history-table { width: 100%; border-collapse: collapse; min-width: 480px; text-align: left; }
+        .history-table th { background: #1e293b; color: #94a3b8; font-size: 8.5px; padding: 10px 4px; border-bottom: 1px solid #334155; text-transform: uppercase; }
+        .history-table td { padding: 8px 4px; border-bottom: 1px solid #1e293b; font-size: 9.5px; color: #cbd5e1; }
+        .td-date { font-weight: 700; color: #fff; white-space: nowrap; font-size: 9px; }
+        .td-photo img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; border: 1px solid #334155; }
+        
+        .badge { font-size: 7.5px; font-weight: 700; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-bottom: 2px; }
+        .badge.hadir { background: #064e3b; color: #34d399; border: 1px solid #047857; }
+        .badge.terlambat { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+        .badge.izin { background: #581c87; color: #d8b4fe; border: 1px solid #6b21a8; }
+        .badge.sakit { background: #1e3a8a; color: #93c5fd; border: 1px solid #1e40af; }
+        .badge.alfa { background: #450a0a; color: #ef4444; border: 1px solid #7f1d1d; }
+        .badge.tepat-waktu { background: #064e3b; color: #34d399; border: 1px solid #047857; }
+        .badge.pulang-awal { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+        .badge.tidak-absen { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; }
+        .td-time { font-size: 8.5px; color: #94a3b8; }
+        .status-msg { margin-top: 12px; padding: 10px; border-radius: 10px; font-size: 12px; text-align: center; }
+        .status-msg.error { background: #450a0a; color: #fca5a5; border: 1px solid #7f1d1d; }
+        .status-msg.success { background: #022c22; color: #6ee7b7; border: 1px solid #047857; }
+        .option-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .option-card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; }
+        .option-card.selected { border-color: #38bdf8; background: #1e293b; }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- ==================== FORM LOGIN KARYAWAN ==================== -->
+        <div id="login-view" class="card" style="margin-top: auto; margin-bottom: auto;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="width: 60px; height: 60px; background: #1e293b; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 10px; border: 1px solid #334155;">
+                    <img src="https://lh3.googleusercontent.com/d/1qX5RAJgU8VuEBgEGLsga6oKZLvbde8AZ" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h2 style="font-size: 18px; font-weight: 700;">Attendance Pro</h2>
+                <p style="font-size: 12px; color: #64748b;">CV. Andara Wijaya</p>
+            </div>
+
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="username" value="fejri" placeholder="Username">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" value="" placeholder="Masukkan Password">
+                </div>
+            </div>
+
+            <button class="btn" onclick="handleLogin()">
+                <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
+            </button>
+
+            <div id="login-status" class="status-msg hidden"></div>
+        </div>
+
+        <!-- ==================== MAIN APP CONTENT ==================== -->
+        <div id="main-app" class="hidden">
+
+            <!-- TOPBAR HEADER -->
+            <div class="app-topbar">
+                <div class="user-profile-header">
+                    <div class="avatar-icon">
+                        <img src="https://lh3.googleusercontent.com/d/1qX5RAJgU8VuEBgEGLsga6oKZLvbde8AZ" alt="Logo">
+                    </div>
+                    <div class="user-meta">
+                        <h3 id="topbar-user-name">Muhammad Fejri Febriyan</h3>
+                        <p>ID: #327405260107</p>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <div class="icon-btn" onclick="openNotifications()" style="position: relative;">
+                        <i class="fa-regular fa-bell"></i>
+                        <span id="notif-badge" class="hidden" style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
+                    </div>
+                    <div class="icon-btn" onclick="handleLogout()">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </div>
+                </div>
+
+                <!-- MODAL NOTIFIKASI -->
+                <div id="notif-modal" class="card hidden" style="position: absolute; top: 60px; left: 0; right: 0; z-index: 1000; max-height: 380px; overflow-y: auto; background: #1e293b; border: 1px solid #334155;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px;">
+                        <h3 style="font-size: 13px; color: #fff;"><i class="fa-solid fa-bell" style="color: #38bdf8;"></i> Riwayat Notifikasi</h3>
+                        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 16px; color: #94a3b8;" onclick="closeNotifications()"></i>
+                    </div>
+                    <div id="notif-list" style="font-size: 11px; color: #cbd5e1;">
+                        <p style="color: #64748b; text-align: center; padding: 10px;">Belum ada notifikasi.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 1: ABSEN UTAMA -->
+            <div id="tab-absen" class="tab-content">
+                <div class="clock-display">
+                    <div class="clock-time" id="live-clock">00:00:00</div>
+                    <div class="clock-date" id="live-date">Hari, 00 Bulan 2026</div>
+                </div>
+
+                <div class="face-scan-wrapper">
+                    <div class="circular-camera-container">
+                        <div class="circular-camera-inner">
+                            <video id="webcam" autoplay playsinline muted></video>
+                            <div id="camera-fallback" class="camera-fallback-overlay hidden">
+                                <i class="fa-solid fa-camera" style="font-size: 24px; color: #38bdf8; margin-bottom: 6px;"></i>
+                                <p style="font-size: 10px; color: #cbd5e1; margin-bottom: 8px;">Ketuk untuk aktifkan kamera</p>
+                                <button class="btn" style="padding: 6px 12px; font-size: 10px; width: auto;" onclick="requestCameraExplicitly()">Izinkan Kamera</button>
+                            </div>
+                            <div class="scan-line"></div>
+                        </div>
+                    </div>
+                    <div id="gps-status-badge" class="gps-status-badge">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> GPS LOCATING...
+                    </div>
+                    <div class="scan-instruction">Scanning... Real-time camera required</div>
+                </div>
+
+                <div class="location-info-card">
+                    <span class="location-label">Current Location</span>
+                    <span class="location-value" id="gps-coords-text">LOCATION FOUND</span>
+                </div>
+
+                <!-- WAJIB FOTO TOKEN LISTRIK -->
+                <div class="token-section-box">
+                    <h4 style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;"><i class="fa-solid fa-bolt text-yellow-400"></i> Wajib Foto Token Listrik</h4>
+                    <p style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;">Ambil foto meteran token asli secara real-time untuk keempat kamar berikut:</p>
+                    
+                    <div class="token-grid">
+                        <div class="token-item">
+                            <h4>Kamar 14B</h4>
+                            <img id="preview-14b" class="token-preview-img" src="" alt="Belum ada foto">
+                            <button class="btn-token-capture" onclick="captureTokenPhoto('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
+                        </div>
+                        <div class="token-item">
+                            <h4>Kamar 15</h4>
+                            <img id="preview-15" class="token-preview-img" src="" alt="Belum ada foto">
+                            <button class="btn-token-capture" onclick="captureTokenPhoto('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
+                        </div>
+                        <div class="token-item">
+                            <h4>Kamar 16</h4>
+                            <img id="preview-16" class="token-preview-img" src="" alt="Belum ada foto">
+                            <button class="btn-token-capture" onclick="captureTokenPhoto('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
+                        </div>
+                        <div class="token-item">
+                            <h4>Kamar 19</h4>
+                            <img id="preview-19" class="token-preview-img" src="" alt="Belum ada foto">
+                            <button class="btn-token-capture" onclick="captureTokenPhoto('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-grid">
+                    <button class="btn-absen btn-absen-masuk" onclick="submitAbsen('MASUK')">
+                        <i class="fa-solid fa-right-to-bracket"></i> Absen Masuk
+                    </button>
+                    <button class="btn-absen btn-absen-pulang" onclick="submitAbsen('PULANG')">
+                        <i class="fa-solid fa-right-from-bracket"></i> Absen Pulang
+                    </button>
+                </div>
+
+                <div id="absen-status" class="status-msg hidden"></div>
+            </div>
+
+            <!-- TAB 2: HR MENU (SLIP GAJI & HISTORY) -->
+            <div id="tab-hr" class="tab-content card hidden">
+                <div id="hr-login-box">
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 16px;">Verifikasi HR / Admin</h3>
+                        <p style="font-size: 12px; color: #64748b;">Akses khusus laporan & rekap gaji</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Username Admin</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <input type="text" id="hr-username" value="andara">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password Admin</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-key"></i>
+                            <input type="password" id="hr-password" value="">
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="handleHRLogin()">
+                        <i class="fa-solid fa-unlock"></i> Verifikasi
+                    </button>
+
+                    <div id="hr-login-status" class="status-msg hidden"></div>
+                </div>
+
+                <div id="hr-dashboard-box" class="hidden">
+                    
+                    <!-- KONTROL PILIH MINGGU SLIP GAJI -->
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <h3 style="font-size: 16px;">Slip Gaji Mingguan</h3>
+                        <p style="font-size: 11px; color: #38bdf8; margin-bottom: 8px;" id="slip-periode-label">Periode Kerja</p>
+                        
+                        <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 14px;">
+                            <input type="date" id="picker-tanggal-slip" style="padding: 6px 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 11px;" onchange="loadSlipGajiCustom(this.value)">
+                            <button class="btn" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="loadSlipGajiCurrentWeek()">Minggu Ini</button>
+                        </div>
+                    </div>
+
+                    <!-- KONTAINER SLIP GAJI -->
+                    <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 14px; background: #ffffff; border-radius: 12px; padding: 4px;">
+                        <div id="slip-pdf-wrapper" style="background: white; color: #0f172a; padding: 28px 32px; width: 1000px; min-width: 1000px; display: flex; flex-direction: column; justify-content: flex-start; gap: 18px; box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0 auto;">
+                            
+                            <!-- Header Slip -->
+                            <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 2px;">
+                                <tr>
+                                    <td style="width: 30%; text-align: left; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0;">
+                                        <h1 style="font-size: 20px; font-weight: bold; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">SLIP GAJI</h1>
+                                        <p style="font-size: 13px; color: #475569; margin: 2px 0 0 0; font-weight: 500;" id="slip-tgl-label">01 November 2026</p>
+                                    </td>
+                                    <td style="width: 40%; text-align: center; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0;">
+                                        <span style="font-size: 25px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; text-transform: uppercase;">CV. WIJAYA GRUP</span>
+                                    </td>
+                                    <td style="width: 30%; text-align: right; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0; font-size: 12px; color: #64748b; line-height: 1.3;">
+                                        <p style="font-weight: 600; color: #334155; margin: 0;">Payroll Doc</p>
+                                        <p style="margin: 0;">Confidential</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Info Karyawan -->
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; font-size: 13px; text-align: center;">
+                                <tr>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; width: 15%; color: #334155; vertical-align: middle !important; text-align: center !important;">Nama</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; width: 35%; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;" id="slip-nama">Muhammad Fejri Febriyan</td>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; width: 15%; color: #334155; vertical-align: middle !important; text-align: center !important;">Minggu</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; width: 35%; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;" id="slip-minggu-ke">-</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; color: #334155; vertical-align: middle !important; text-align: center !important;">Jabatan</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;">Staff</td>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; color: #334155; vertical-align: middle !important; text-align: center !important;">Periode</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;" id="slip-periode">25 Oct 2026 - 31 Oct 2026</td>
+                                </tr>
+                            </table>
+
+                            <!-- Bagian Kehadiran -->
+                            <div>
+                                <div style="background: #0f172a; color: white; font-size: 12px; font-weight: bold; padding: 8px 14px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
+                                    Hari Kerja & Kehadiran
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; font-size: 11.5px; text-align: center;">
+                                    <thead>
+                                        <tr style="background: #f1f5f9; color: #334155; font-weight: 700;">
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 4%; vertical-align: middle !important; text-align: center !important;">NO</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 6px; width: 20%; vertical-align: middle !important; text-align: center !important;">NAMA</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 8%; vertical-align: middle !important; text-align: center !important;">JABATAN</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 18%; vertical-align: middle !important; text-align: center !important;">PERIODE</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; vertical-align: middle !important; text-align: center !important;">MASUK</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; vertical-align: middle !important; text-align: center !important;">IZIN</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; vertical-align: middle !important; text-align: center !important; background: #ffffff;">SAKIT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; background: #fee2e2; color: #991b1b; vertical-align: middle !important; text-align: center !important;">ALFA</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; background: #fee2e2; color: #991b1b; vertical-align: middle !important; text-align: center !important;">TELAT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 6%; background: #fee2e2; color: #991b1b; vertical-align: middle !important; text-align: center !important;">NO OUT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 9%; vertical-align: middle !important; text-align: center !important; white-space: nowrap;">POINT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 9%; vertical-align: middle !important; text-align: center !important; white-space: nowrap;">KOMISI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="color: #1e293b;">
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important;">1</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 6px; vertical-align: middle !important; text-align: center !important; font-weight: 600; font-size: 11px; line-height: 1.3;" id="slip-nama-row">Muhammad Fejri Febriyan</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 600;">Staff</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 600;" id="slip-periode-row">25 Oct 2026 - 31 Oct 2026</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; font-weight: 700;" id="slip-hk">2 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; font-weight: 700;" id="slip-izin">0 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; font-weight: 700; background: #ffffff;" id="slip-sakit">0 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-alfa">0 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-telat">1 Kali</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-no-pulang">1 Kali</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 700; white-space: nowrap;" id="slip-point">0 Point</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 700; white-space: nowrap;" id="slip-tamu">0 Tamu</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Bagian Upah & Potongan -->
+                            <div>
+                                <div style="background: #0f172a; color: white; font-size: 12px; font-weight: bold; padding: 8px 14px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
+                                    Rincian Upah, Potongan & Hasil Akhir
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; font-size: 13px; text-align: center;">
+                                    <thead>
+                                        <tr style="background: #f1f5f9; color: #334155; font-weight: 700;">
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">UPAH POKOK</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">RP POINT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">RP KOMISI</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">TOTAL POTONGAN</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; font-weight: bold; color: #0f172a; vertical-align: middle !important; text-align: center !important;">GAJI BERSIH</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="color: #1e293b; font-weight: 700;">
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important;" id="slip-total-hk">Rp100.000</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important;" id="slip-total-point">Rp0</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important;" id="slip-total-komisi">Rp0</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important; color: #dc2626; background: #fef2f2;" id="slip-total-denda">Rp40.000</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important; font-weight: 800; color: #0f172a; font-size: 15px;" id="slip-grand-total">Rp60.000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Kotak Catatan Potongan -->
+                            <div style="border: 1px solid #cbd5e1; background: #ffffff; padding: 10px 14px; font-size: 12.5px; color: #1e293b; font-weight: 600;">
+                                <span id="slip-rincian-potongan">Rincian Potongan: Tidak ada potongan</span>
+                            </div>
+
+                            <!-- Tanda Tangan -->
+                            <table style="width: 100%; border-collapse: collapse; border: none; font-size: 12.5px; text-align: center; margin-top: 10px;">
+                                <tr>
+                                    <td style="width: 25%; vertical-align: top; border: none; padding: 0 5px;">
+                                        <div style="color: #334155; font-weight: 600; margin-bottom: 32px;">Disetujui <span style="color: #2563eb;">✓</span></div>
+                                        <div style="border-top: 1px solid #94a3b8; margin: 0 auto 6px auto; width: 90%;"></div>
+                                        <p style="font-weight: 700; color: #1e293b; margin: 0;">Finance</p>
+                                    </td>
+                                    <td style="width: 25%; vertical-align: top; border: none; padding: 0 5px;">
+                                        <div style="color: #334155; font-weight: 600; margin-bottom: 32px;">Mengetahui</div>
+                                        <div style="border-top: 1px solid #94a3b8; margin: 0 auto 6px auto; width: 90%;"></div>
+                                        <p style="font-weight: 700; color: #1e293b; margin: 0;">Coordinator</p>
+                                    </td>
+                                    <td style="width: 25%; vertical-align: top; border: none; padding: 0 5px;">
+                                        <div style="color: #334155; font-weight: 600; margin-bottom: 32px;">Diperiksa</div>
+                                        <div style="border-top: 1px solid #94a3b8; margin: 0 auto 6px auto; width: 90%;"></div>
+                                        <p style="font-weight: 700; color: #1e293b; margin: 0;">Manager</p>
+                                    </td>
+                                    <td style="width: 25%; vertical-align: top; border: none; padding: 0 5px;">
+                                        <div style="color: #334155; font-weight: 600; margin-bottom: 16px;">Diterima</div>
+                                        <div style="border-top: 1px solid #94a3b8; margin: 0 auto 4px auto; width: 90%;"></div>
+                                        <p style="font-weight: 700; color: #1e293b; margin: 0;">Pegawai</p>
+                                        <p style="font-size: 11px; color: #1e293b; margin: 0; font-weight: 700;">DANA: 082262839119</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi Gambar JPG & Email -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;">
+                        <button class="btn" style="background: #10b981;" onclick="downloadSlipJPG()">
+                            <i class="fa-solid fa-file-image"></i> Unduh Gambar (JPG)
+                        </button>
+                        <button class="btn" style="background: #ea580c;" onclick="sendSlipToGmail()">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Email
+                        </button>
+                    </div>
+
+                    <div id="email-status" class="status-msg hidden"></div>
+
+                    <!-- CARD BARU: PREVIEW FOTO TOKEN LISTRIK (RIWAYAT 30 HARI) -->
+                    <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 style="font-size: 13px; color: #38bdf8;"><i class="fa-solid fa-bolt"></i> Preview Foto Token Listrik (30 Hari)</h3>
+                            <input type="date" id="picker-token-history" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 10px;" onchange="loadTokenHistoryByDate(this.value)">
+                        </div>
+                        <p style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;" id="token-history-date-label">Menampilkan data hari ini</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="token-history-preview-container">
+                            <!-- Diisi dinamis via JS -->
+                        </div>
+                    </div>
+
+                    <!-- ==================== HISTORY 31 HARI ==================== -->
+                    <hr style="border-color: #334155; margin-bottom: 15px;">
+                    <h3 style="font-size: 14px; margin-bottom: 12px; text-align: center;">Riwayat Presensi (31 Hari)</h3>
+
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" onclick="applyFilter('SEMUA', this)">Semua</button>
+                        <button class="filter-btn" onclick="applyFilter('TERLAMBAT', this)">Terlambat</button>
+                        <button class="filter-btn" onclick="applyFilter('IZIN', this)">Izin</button>
+                        <button class="filter-btn" onclick="applyFilter('SAKIT', this)">Sakit</button>
+                        <button class="filter-btn" onclick="applyFilter('ALFA', this)">Alfa</button>
+                    </div>
+
+                    <div id="filter-summary" class="filter-summary">Memuat riwayat absen...</div>
+                    
+                    <div class="history-table-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>TANGGAL</th>
+                                    <th style="text-align: center;">FOTO IN</th>
+                                    <th style="text-align: center;">FOTO OUT</th>
+                                    <th>STATUS IN</th>
+                                    <th>STATUS OUT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <button class="btn btn-secondary" style="margin-top: 20px;" onclick="lockHRAccess()">
+                        <i class="fa-solid fa-lock"></i> Kunci Akses HR
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 3: HARI KERJA -->
+            <div id="tab-hari-kerja" class="tab-content card hidden">
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 16px;">Ringkasan Minggu Ini</h3>
+                    <p style="font-size: 11px; color: #38bdf8;" id="hk-periode-label">Memuat data...</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #1e3a8a; color: #38bdf8;"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="stat-info"><div class="title">Total Masuk</div><div class="value" id="hk-val-masuk">0 Hari</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #713f12; color: #facc15;"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-info"><div class="title">Total Tamu</div><div class="value" id="hk-val-tamu">0 Tamu</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #064e3b; color: #34d399;"><i class="fa-solid fa-star"></i></div>
+                        <div class="stat-info"><div class="title">Total Point</div><div class="value" id="hk-val-point">0 Point</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #581c87; color: #c084fc;"><i class="fa-solid fa-bed"></i></div>
+                        <div class="stat-info"><div class="title">Total Izin</div><div class="value" id="hk-val-izin">0 Hari</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #450a0a; color: #f87171;"><i class="fa-solid fa-user-xmark"></i></div>
+                        <div class="stat-info"><div class="title">Total Alfa</div><div class="value" id="hk-val-alfa">0 Hari</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #7f1d1d; color: #fca5a5;"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <div class="stat-info">
+                            <div class="title">Total Telat</div>
+                            <div class="value" id="hk-val-telat">0 Kali</div>
+                            <div style="font-size:8.5px; color:#94a3b8" id="hk-ket-telat">-</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #450a0a; color: #ef4444;"><i class="fa-solid fa-notes-medical"></i></div>
+                        <div class="stat-info"><div class="title">Total Sakit</div><div class="value" id="hk-val-sakit">0 Hari</div></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #450a0a; color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="stat-info"><div class="title">Tidak Absen Pulang</div><div class="value" id="hk-val-nopulang">0 Kali</div></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="loadHariKerjaStats()">
+                    <i class="fa-solid fa-arrows-rotate"></i> Refresh Data Mingguan
+                </button>
+            </div>
+
+            <!-- TAB 4: PERIZINAN -->
+            <div id="tab-izin" class="tab-content card hidden">
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 16px;">Form Perizinan</h3>
+                    <p style="font-size: 11px; color: #64748b;">Pilih jenis perizinan yang diajukan</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Pilih Kategori</label>
+                    <div class="option-cards">
+                        <div class="option-card selected" onclick="selectIzinCategory('SAKIT', this)">
+                            <i class="fa-solid fa-notes-medical" style="color: #38bdf8;"></i>
+                            <span>Sakit</span>
+                        </div>
+                        <div class="option-card" onclick="selectIzinCategory('IZIN', this)">
+                            <i class="fa-solid fa-user-gear" style="color: #c084fc;"></i>
+                            <span>Izin</span>
+                        </div>
+                        <div class="option-card" onclick="selectIzinCategory('ALFA', this)">
+                            <i class="fa-solid fa-circle-exclamation" style="color: #f87171;"></i>
+                            <span>Alfa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Alasan / Keterangan</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <textarea id="alasan-izin" placeholder="Tuliskan keterangan perizinan..."></textarea>
+                    </div>
+                </div>
+
+                <button class="btn" style="background: #8b5cf6;" onclick="submitIzin()">
+                    <i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan
+                </button>
+
+                <div id="izin-status" class="status-msg hidden"></div>
+            </div>
+
+            <!-- BOTTOM NAVIGATION -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="switchTab('absen')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+                <div class="nav-item" onclick="switchTab('hr')"><i class="fa-solid fa-shield-halved"></i><span>HR Menu</span></div>
+                <div class="nav-item" onclick="switchTab('hari-kerja')"><i class="fa-solid fa-calendar-days"></i><span>History</span></div>
+                <div class="nav-item" onclick="switchTab('izin')"><i class="fa-solid fa-file-signature"></i><span>Izin</span></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CUSTOM MODAL POPUP -->
+    <div id="custom-modal-popup" class="custom-modal-overlay hidden">
+        <div class="custom-modal-box">
+            <div id="custom-modal-icon" style="font-size: 32px; color: #f59e0b; margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 id="custom-modal-title" style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px;">Informasi Presensi</h3>
+            <p id="custom-modal-message" style="font-size: 12px; color: #cbd5e1; margin-bottom: 20px; line-height: 1.4;"></p>
+            <button class="btn" onclick="closeCustomModal()" style="background: #2563eb; width: 100%; padding: 10px; border-radius: 10px;">OK</button>
+        </div>
+    </div>
+
+    <!-- LOGIKA JAVASCRIPT -->
+    <script>
+        const SCRIPT_URL = 'URL_WEB_APP_GAS_ANDA_DISINI'; // Ganti dengan URL deployment Web App GAS Anda
+
+        const TARGET_LAT = -6.718875;
+        const TARGET_LNG = 108.533493;
+        const MAX_ALLOWED_RADIUS = 15.0;
+
+        let isHRAuthenticated = false;
+        let selectedIzinType = 'SAKIT';
+        let currentLat = null;
+        let currentLng = null;
+        let currentDistance = null;
+        let currentAddress = "Kost Andara Wijaya, Cirebon";
+        let videoStream = null;
+        let globalHistoryData = [];
+        let appNotifications = JSON.parse(localStorage.getItem('app_notifications') || '[]');
+        let allowForcePulang = false;
+
+        // Penyimpanan data foto token lokal sesi berjalan
+        let tokenPhotos = {
+            '14B': null,
+            '15': null,
+            '16': null,
+            '19': null
+        };
+
+        async function callGAS(action, dataObj = null) {
+            const formData = new URLSearchParams();
+            formData.append('action', action);
+            if (dataObj) {
+                formData.append('data', JSON.stringify(dataObj));
+            }
+            try {
+                const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
+                return await response.json();
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return { success: false, message: 'Gagal terhubung ke server database (GAS).' };
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            startLiveClock();
+            updateNotificationBadge();
+            const savedUser = localStorage.getItem('app_user_session');
+            if (savedUser) { showMainApp(savedUser); } else { initCamera(); }
+        });
+
+        function startLiveClock() {
+            function update() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const clockEl = document.getElementById('live-clock');
+                if (clockEl) clockEl.innerHTML = `${hours}:${minutes}:${seconds}`;
+
+                const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                const dateEl = document.getElementById('live-date');
+                if (dateEl) dateEl.innerText = dateStr;
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        function showCustomModal(title, message, iconClass = 'fa-triangle-exclamation', iconColor = '#f59e0b') {
+            const modal = document.getElementById('custom-modal-popup');
+            document.getElementById('custom-modal-title').innerText = title;
+            document.getElementById('custom-modal-message').innerText = message;
+            const iconEl = document.getElementById('custom-modal-icon');
+            if (iconEl) {
+                iconEl.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+                iconEl.style.color = iconColor;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
+
+        function addNotification(title, message, time, status) {
+            const notif = { title, message, time, status, date: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) };
+            appNotifications.unshift(notif);
+            if (appNotifications.length > 20) appNotifications.pop();
+            localStorage.setItem('app_notifications', JSON.stringify(appNotifications));
+            updateNotificationBadge();
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notif-badge');
+            if (badge) {
+                if (appNotifications.length > 0) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+        }
+
+        function openNotifications() {
+            const modal = document.getElementById('notif-modal');
+            modal.classList.remove('hidden');
+            renderNotificationList();
+        }
+
+        function renderNotificationList() {
+            const list = document.getElementById('notif-list');
+            if (!list) return;
+            if (appNotifications.length === 0) {
+                list.innerHTML = '<p style="color: #64748b; text-align: center; padding: 10px;">Belum ada notifikasi.</p>';
+                return;
+            }
+            list.innerHTML = appNotifications.map((n, index) => `
+                <div class="notif-card-item" id="notif-item-${index}" 
+                     style="border-left: 4px solid ${n.status.toLowerCase().includes('terlambat') || n.status.toLowerCase().includes('alfa') ? '#ef4444' : '#10b981'};"
+                     data-index="${index}"
+                     ontouchstart="handleTouchStart(event, ${index})"
+                     ontouchmove="handleTouchMove(event, ${index})"
+                     ontouchend="handleTouchEnd(event, ${index})"
+                     onmousedown="handleTouchStart(event, ${index})"
+                     onmousemove="handleTouchMove(event, ${index})"
+                     onmouseup="handleTouchEnd(event, ${index})"
+                     onmouseleave="handleTouchEnd(event, ${index})">
+                    <div style="font-weight: bold; color: #fff; display: flex; justify-content: space-between;">
+                        <span>${n.title}</span><span style="font-size: 10px; color: #94a3b8;">${n.date}</span>
+                    </div>
+                    <div style="color: #cbd5e1;">${n.message}</div>
+                    <div style="font-size: 10px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                        <span>🕒 Jam: <b>${n.time} WIB</b> | Status: <b>${n.status}</b></span>
+                        <span style="font-size: 8px; color: #64748b; font-style: italic;">← Geser hapus →</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let swipeData = { index: null, startX: 0, currentX: 0, isDragging: false };
+
+        function handleTouchStart(e, index) {
+            swipeData.index = index;
+            swipeData.startX = e.touches ? e.touches[0].clientX : e.clientX;
+            swipeData.isDragging = true;
+        }
+
+        function handleTouchMove(e, index) {
+            if (!swipeData.isDragging || swipeData.index !== index) return;
+            const currentXCoord = e.touches ? e.touches[0].clientX : e.clientX;
+            swipeData.currentX = currentXCoord - swipeData.startX;
+            const item = document.getElementById(`notif-item-${index}`);
+            if (item) {
+                item.style.transform = `translateX(${swipeData.currentX}px)`;
+                item.style.opacity = `${Math.max(0.2, 1 - Math.abs(swipeData.currentX) / 200)}`;
+            }
+        }
+
+        function handleTouchEnd(e, index) {
+            if (!swipeData.isDragging || swipeData.index !== index) return;
+            const item = document.getElementById(`notif-item-${index}`);
+            if (item) {
+                if (Math.abs(swipeData.currentX) > 80) {
+                    item.style.transform = `translateX(${swipeData.currentX > 0 ? 350 : -350}px)`;
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        appNotifications.splice(index, 1);
+                        localStorage.setItem('app_notifications', JSON.stringify(appNotifications));
+                        updateNotificationBadge();
+                        renderNotificationList();
+                    }, 200);
+                } else {
+                    item.style.transform = 'translateX(0px)';
+                    item.style.opacity = '1';
+                }
+            }
+            swipeData.isDragging = false;
+            swipeData.index = null;
+            swipeData.currentX = 0;
+        }
+
+        function closeNotifications() { document.getElementById('notif-modal').classList.add('hidden'); }
+        function showStatus(elementId, msg, type) {
+            const el = document.getElementById(elementId);
+            if (el) { el.innerText = msg; el.className = `status-msg ${type}`; el.classList.remove('hidden'); }
+        }
+
+        async function initCamera() {
+            const video = document.getElementById('webcam');
+            const fallbackOverlay = document.getElementById('camera-fallback');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+            try {
+                if (videoStream) videoStream.getTracks().forEach(track => track.stop());
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 720 } }, audio: false });
+                if (video) { video.srcObject = videoStream; video.onloadedmetadata = () => video.play().catch(e => console.warn(e)); }
+                if (fallbackOverlay) fallbackOverlay.classList.add('hidden');
+            } catch (err) {
+                if (fallbackOverlay) fallbackOverlay.classList.remove('hidden');
+            }
+        }
+
+        function requestCameraExplicitly() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+            .then(stream => {
+                if (videoStream) videoStream.getTracks().forEach(track => track.stop());
+                videoStream = stream;
+                const video = document.getElementById('webcam');
+                if (video) { video.srcObject = stream; video.play().catch(e => console.warn(e)); }
+                document.getElementById('camera-fallback').classList.add('hidden');
+            }).catch(err => alert("Akses kamera ditolak atau diblokir."));
+        }
+
+        // Fungsi khusus ambil foto Token secara real-time dari kamera aktif
+        function captureTokenPhoto(kamarNum) {
+            if (!videoStream) {
+                alert("Kamera belum aktif! Silakan aktifkan kamera terlebih dahulu.");
+                initCamera();
+                return;
+            }
+            const video = document.getElementById('webcam');
+            const canvas = document.createElement('canvas');
+            const maxWidth = 480;
+            const scale = maxWidth / (video.videoWidth || 640);
+            canvas.width = maxWidth;
+            canvas.height = (video.videoHeight || 640) * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
+
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+            ctx.fillRect(12, canvas.height - 50, canvas.width - 24, 42);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(12, canvas.height - 50, 4, 42);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 10px Inter, Arial, sans-serif";
+            ctx.fillText(`⚡ TOKEN KAMAR ${kamarNum} ${coordsStr}`, 20, canvas.height - 32);
+            ctx.fillStyle = "#cbd5e1";
+            ctx.font = "9px Inter, Arial, sans-serif";
+            ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 20, canvas.height - 14);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+            tokenPhotos[kamarNum] = dataUrl;
+
+            // Update preview card UI
+            const previewEl = document.getElementById(`preview-${kamarNum.toLowerCase()}`);
+            if (previewEl) {
+                previewEl.src = dataUrl;
+            }
+        }
+
+        function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; const rad = Math.PI / 180;
+            const dLat = (lat2 - lat1) * rad; const dLon = (lon2 - lon1) * rad;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function initLocation() {
+            const badge = document.getElementById('gps-status-badge');
+            const coordsText = document.getElementById('gps-coords-text');
+            if (!navigator.geolocation) return;
+            navigator.geolocation.watchPosition(
+                pos => {
+                    currentLat = pos.coords.latitude; currentLng = pos.coords.longitude;
+                    currentDistance = calculateDistanceMeters(currentLat, currentLng, TARGET_LAT, TARGET_LNG);
+                    if (coordsText) coordsText.innerText = `${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`;
+                    if (badge) {
+                        if (currentDistance <= MAX_ALLOWED_RADIUS) {
+                            badge.className = "gps-status-badge";
+                            badge.innerHTML = `<i class="fa-solid fa-check"></i> GPS LOCKED (${currentDistance.toFixed(1)}m)`;
+                        } else {
+                            badge.className = "gps-status-badge out-of-range";
+                            badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> OUT OF RANGE (${currentDistance.toFixed(1)}m)`;
+                        }
+                    }
+                },
+                err => {
+                    if (badge) { badge.className = "gps-status-badge out-of-range"; badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> GPS OFF`; }
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        }
+
+        function showMainApp(userName) {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('topbar-user-name').innerText = userName;
+            switchTab('absen'); initCamera(); initLocation();
+        }
+
+        function handleHRLogin() {
+            const u = document.getElementById('hr-username').value.trim();
+            const p = document.getElementById('hr-password').value.trim();
+            if (u === 'andara' && p === 'cirebon191002') {
+                isHRAuthenticated = true;
+                document.getElementById('hr-login-box').classList.add('hidden');
+                document.getElementById('hr-dashboard-box').classList.remove('hidden');
+                loadSlipGaji(); loadHistory31Days(); loadTokenHistoryByDate('');
+            } else {
+                showStatus('hr-login-status', 'Kredensial Admin HR Salah!', 'error');
+            }
+        }
+
+        function lockHRAccess() {
+            isHRAuthenticated = false;
+            document.getElementById('hr-password').value = '';
+            document.getElementById('hr-dashboard-box').classList.add('hidden');
+            document.getElementById('hr-login-box').classList.remove('hidden');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (tabName === 'absen') {
+                document.getElementById('tab-absen').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+                if (!videoStream) initCamera();
+            } else if (tabName === 'hr') {
+                document.getElementById('tab-hr').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (tabName === 'hari-kerja') {
+                document.getElementById('tab-hari-kerja').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+                loadHariKerjaStats();
+            } else if (tabName === 'izin') {
+                document.getElementById('tab-izin').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[3].classList.add('active');
+            }
+        }
+
+        function capturePhotoWithWatermark() {
+            const video = document.getElementById('webcam');
+            const canvas = document.createElement('canvas');
+            const maxWidth = 480;
+            const scale = maxWidth / (video.videoWidth || 640);
+            canvas.width = maxWidth;
+            canvas.height = (video.videoHeight || 640) * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
+
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+            ctx.fillRect(12, canvas.height - 50, canvas.width - 24, 42);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(12, canvas.height - 50, 4, 42);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 10px Inter, Arial, sans-serif";
+            ctx.fillText(`📍 ${currentAddress} ${coordsStr}`, 20, canvas.height - 32);
+            ctx.fillStyle = "#cbd5e1";
+            ctx.font = "9px Inter, Arial, sans-serif";
+            ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 20, canvas.height - 14);
+            return canvas.toDataURL('image/jpeg', 0.6);
+        }
+
+        function selectIzinCategory(type, element) {
+            selectedIzinType = type;
+            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        async function handleLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            if (!u || !p) { showStatus('login-status', 'Username & Password wajib diisi!', 'error'); return; }
+            showStatus('login-status', 'Memverifikasi Data...', 'success');
+            const res = await callGAS('processLogin', { username: u, password: p });
+            if (res.success) {
+                localStorage.setItem('app_user_session', res.name);
+                showMainApp(res.name);
+            } else {
+                showStatus('login-status', res.message, 'error');
+            }
+        }
+
+        async function submitAbsen(tipe) {
+            if (!currentLat || !currentLng) { showStatus('absen-status', 'Gagal: GPS belum terdeteksi!', 'error'); return; }
+            if (currentDistance > MAX_ALLOWED_RADIUS) { showStatus('absen-status', `Gagal: Posisi Anda ${currentDistance.toFixed(1)} m dari lokasi!`, 'error'); return; }
+
+            // Validasi wajib foto keempat token listrik sebelum absen
+            if (!tokenPhotos['14B'] || !tokenPhotos['15'] || !tokenPhotos['16'] || !tokenPhotos['19']) {
+                showStatus('absen-status', 'Gagal: Wajib foto token listrik kamar 14B, 15, 16, dan 19 terlebih dahulu!', 'error');
+                showCustomModal("Foto Token Belum Lengkap", "Anda wajib mengambil foto meteran token listrik untuk semua kamar (14B, 15, 16, 19) secara real-time sebelum melakukan presensi.", 'fa-triangle-exclamation', '#f59e0b');
+                return;
+            }
+
+            const actionBtn = document.querySelector(tipe === 'MASUK' ? '.btn-absen-masuk' : '.btn-absen-pulang');
+            if (actionBtn) actionBtn.disabled = true;
+            showStatus('absen-status', 'Merekam presensi & token...', 'success');
+
+            let force = (tipe === 'PULANG' && allowForcePulang);
+            const photoData = capturePhotoWithWatermark();
+            
+            const payloadData = {
+                lat: currentLat,
+                lng: currentLng,
+                tipe: tipe,
+                image: photoData,
+                force: force,
+                tokens: tokenPhotos
+            };
+
+            const res = await callGAS('processAbsen', payloadData);
+
+            if (res.success) {
+                allowForcePulang = false;
+                showStatus('absen-status', res.message, 'success');
+                showCustomModal(`Presensi ${tipe} Berhasil`, res.message, 'fa-circle-check', '#38bdf8');
+                addNotification(`Absen ${tipe} Berhasil`, `Pencatatan absen ${tipe.toLowerCase()} & token sukses (${res.message}).`, new Date().toLocaleTimeString('id-ID', {hour12: false}), res.message.includes('Terlambat') ? 'Terlambat' : 'Berhasil');
+                setTimeout(() => loadHistory31Days(), 1500);
+            } else {
+                showStatus('absen-status', res.message, 'error');
+                if (res.isWarningOnly) {
+                    allowForcePulang = true;
+                    showCustomModal("Peringatan Jam Pulang", res.message, 'fa-triangle-exclamation', '#f59e0b');
+                } else {
+                    allowForcePulang = false;
+                    showCustomModal("Gagal Presensi", res.message, 'fa-circle-xmark', '#ef4444');
+                }
+                if (actionBtn) actionBtn.disabled = false;
+            }
+        }
+
+        async function submitIzin() {
+            const alasan = document.getElementById('alasan-izin').value.trim();
+            showStatus('izin-status', 'Mengirim izin...', 'success');
+            const res = await callGAS('processIzin', { jenis: selectedIzinType, alasan: alasan });
+            if (res.success) {
+                showStatus('izin-status', res.message, 'success');
+                showCustomModal("Pengajuan Izin Berhasil", res.message, 'fa-circle-check', '#38bdf8');
+                addNotification(`Pengajuan ${selectedIzinType}`, `Keterangan: ${alasan || 'Tanpa keterangan'}`, new Date().toLocaleTimeString('id-ID', {hour12: false}), selectedIzinType);
+                document.getElementById('alasan-izin').value = '';
+                setTimeout(() => loadHistory31Days(), 1500);
+            } else {
+                showStatus('izin-status', res.message, 'error');
+                showCustomModal("Gagal Mengajukan Izin", res.message, 'fa-circle-xmark', '#ef4444');
+            }
+        }
+
+        async function loadHariKerjaStats() {
+            document.getElementById('hk-periode-label').innerText = "Memuat data...";
+            const res = await callGAS('getHariKerjaData');
+            if (res && res.periodeLabel) {
+                document.getElementById('hk-periode-label').innerText = res.periodeLabel;
+                document.getElementById('hk-val-masuk').innerText = (res.totalMasuk || 0) + " Hari";
+                document.getElementById('hk-val-tamu').innerText = (res.totalTamu || 0) + " Tamu";
+                document.getElementById('hk-val-sakit').innerText = (res.totalSakit || 0) + " Hari";
+                document.getElementById('hk-val-point').innerText = (res.totalPoint || 0) + " Point";
+                document.getElementById('hk-val-izin').innerText = (res.totalIzin || 0) + " Hari";
+                document.getElementById('hk-val-alfa').innerText = (res.totalAlfa || 0) + " Hari";
+                document.getElementById('hk-val-telat').innerText = (res.totalTelat || 0) + " Kali";
+                document.getElementById('hk-val-nopulang').innerText = (res.totalTidakAbsenPulang || 0) + " Kali";
+                document.getElementById('hk-ket-telat').innerText = res.detailTelat || "-";
+            }
+        }
+
+        async function loadHistory31Days() {
+            document.getElementById('filter-summary').innerText = "Memuat riwayat...";
+            const res = await callGAS('getHistory31Days');
+            if (res && res.success) {
+                globalHistoryData = res.history || [];
+                renderHistoryTable("SEMUA");
+            }
+        }
+
+        async function loadTokenHistoryByDate(dateStr) {
+            const container = document.getElementById('token-history-preview-container');
+            const label = document.getElementById('token-history-date-label');
+            container.innerHTML = `<p style="color: #64748b; font-size:11px; text-align:center; grid-column: span 2;">Memuat foto token...</p>`;
+            
+            const res = await callGAS('getTokenHistoryByDate', { targetDate: dateStr });
+            if (res && res.success) {
+                label.innerText = `Menampilkan data tanggal: ${res.displayDate}`;
+                const tokens = res.tokens || {};
+                
+                let html = '';
+                ['14B', '15', '16', '19'].forEach(kamar => {
+                    let item = tokens[kamar] || { pagi: null, malam: null };
+                    html += `
+                        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px;">
+                            <div style="font-size: 11px; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">Kamar ${kamar}</div>
+                            <div style="display: flex; gap: 6px;">
+                                <div style="flex: 1; text-align: center;">
+                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Pagi</div>
+                                    ${item.pagi ? `<a href="${item.pagi}" target="_blank"><img src="${item.pagi}" style="width: 1005; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #475569;"></a>` : '<span style="font-size: 8px; color: #64748b;">-</span>'}
+                                </div>
+                                <div style="flex: 1; text-align: center;">
+                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Malam</div>
+                                    ${item.malam ? `<a href="${item.malam}" target="_blank"><img src="${item.malam}" style="width: 100%; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #475569;"></a>` : '<span style="font-size: 8px; color: #64748b;">-</span>'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<p style="color: #ef4444; font-size:11px; text-align:center; grid-column: span 2;">Gagal memuat data token.</p>`;
+            }
+        }
+
+        function applyFilter(type, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            renderHistoryTable(type);
+        }
+
+        function getDriveDirectUrl(url) {
+            if (!url || url === "-" || url === "") return "";
+            if (url.includes("drive.google.com/file/d/")) {
+                const match = url.match(/\/d\/(.*?)\//);
+                if (match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            return url;
+        }
+
+        function formatTimeOnly(timeStr) {
+            if (!timeStr || timeStr === "-") return "-";
+            if (timeStr.includes("T")) return timeStr.split("T")[1].split(".")[0];
+            return timeStr;
+        }
+
+        function renderHistoryTable(filterType) {
+            const tBody = document.getElementById('history-table-body');
+            tBody.innerHTML = "";
+            let filteredData = (filterType === "SEMUA") ? globalHistoryData : globalHistoryData.filter(item => item.filterType === filterType);
+
+            if (filteredData.length === 0) {
+                tBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">Tidak ada data.</td></tr>`;
+                document.getElementById('filter-summary').innerText = `Total ${filterType}: 0 Data`;
+                return;
+            }
+
+            document.getElementById('filter-summary').innerText = `Menampilkan Total ${filterType}: ${filteredData.length} Hari`;
+            filteredData.forEach(item => {
+                let inStatus = item.statusIn || "-";
+                let inClass = inStatus.toUpperCase().includes("TERLAMBAT") ? "terlambat" : (inStatus.toUpperCase().includes("SAKIT") ? "sakit" : (inStatus.toUpperCase().includes("IZIN") ? "izin" : (inStatus.toUpperCase().includes("ALFA") ? "alfa" : "hadir")));
+                let outStatus = item.statusOut || "-";
+                let outClass = outStatus.toUpperCase().includes("TIDAK ABSEN") ? "tidak-absen" : "tepat-waktu";
+
+                tBody.innerHTML += `
+                    <tr>
+                        <td class="td-date">${item.tanggalDisplay}</td>
+                        <td style="text-align: center;" class="td-photo">${getDriveDirectUrl(item.foto) ? `<a href="${getDriveDirectUrl(item.foto)}" target="_blank"><img src="${getDriveDirectUrl(item.foto)}"></a>` : '-'}</td>
+                        <td style="text-align: center;" class="td-photo">${getDriveDirectUrl(item.fotoPulang) ? `<a href="${getDriveDirectUrl(item.fotoPulang)}" target="_blank"><img src="${getDriveDirectUrl(item.fotoPulang)}"></a>` : '-'}</td>
+                        <td><span class="badge ${inClass}">${inStatus}</span><div class="td-time">In: ${formatTimeOnly(item.masuk)}</div></td>
+                        <td><span class="badge ${outClass}">${outStatus}</span><div class="td-time">Out: ${formatTimeOnly(item.pulang)}</div></td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function loadSlipGaji(targetDateStr = null) {
+            const res = await callGAS('getSlipGajiData', targetDateStr ? { targetDateStr: targetDateStr } : null);
+            if (res && res.nama) {
+                document.getElementById('slip-nama').innerText = res.nama;
+                document.getElementById('slip-nama-row').innerText = res.nama;
+                document.getElementById('slip-minggu-ke').innerText = "-";
+                document.getElementById('slip-tgl-label').innerText = res.tanggalCetak;
+                document.getElementById('slip-periode-label').innerText = "Periode Kerja: " + res.periode;
+                document.getElementById('slip-periode').innerText = res.periode;
+                document.getElementById('slip-periode-row').innerText = res.periode;
+                document.getElementById('slip-hk').innerText = res.totalMasuk + " Hari";
+                document.getElementById('slip-izin').innerText = (res.totalIzin || 0) + " Hari";
+                document.getElementById('slip-sakit').innerText = (res.totalSakit || 0) + " Hari";
+                document.getElementById('slip-alfa').innerText = (res.totalAlfa || 0) + " Hari";
+                document.getElementById('slip-telat').innerText = (res.totalTelat || 0) + " Kali";
+                document.getElementById('slip-no-pulang').innerText = (res.totalTidakAbsenPulang || 0) + " Kali";
+                document.getElementById('slip-point').innerText = res.totalPoint + " Point";
+                document.getElementById('slip-tamu').innerText = res.totalTamu + " Tamu";
+
+                document.getElementById('slip-total-hk').innerText = `Rp${res.gajiPokok.toLocaleString('id-ID')}`;
+                document.getElementById('slip-total-point').innerText = `Rp${res.komisiPoint.toLocaleString('id-ID')}`;
+                document.getElementById('slip-total-komisi').innerText = `Rp${res.komisiTamu.toLocaleString('id-ID')}`;
+                document.getElementById('slip-total-denda').innerText = `Rp${res.totalDenda.toLocaleString('id-ID')}`;
+                document.getElementById('slip-grand-total').innerText = `Rp${res.gajiBersih.toLocaleString('id-ID')}`;
+                
+                let rawPotongan = res.rincianPotongan || 'Tidak ada potongan';
+                let formattedPotongan = rawPotongan
+                    .replace(/TERLAMBAT/g, '<span style="color: #dc2626; font-weight: 700;">TERLAMBAT</span>')
+                    .replace(/TIDAK ABSEN PULANG/g, '<span style="color: #dc2626; font-weight: 700;">TIDAK ABSEN PULANG</span>')
+                    .replace(/ALFA/g, '<span style="color: #dc2626; font-weight: 700;">ALFA</span>');
+                document.getElementById('slip-rincian-potongan').innerHTML = formattedPotongan;
+            }
+        }
+
+        function loadSlipGajiCustom(val) { if (val) loadSlipGaji(val); }
+        function loadSlipGajiCurrentWeek() { document.getElementById('picker-tanggal-slip').value = ""; loadSlipGaji(null); }
+
+        function downloadSlipJPG() {
+            const element = document.getElementById('slip-pdf-wrapper');
+            html2canvas(element, {
+                scale: 3,
+                useCORS: true,
+                letterRendering: true,
+                windowWidth: 1000
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `SLIP_GAJI_CV_WIJAYA_GRUP.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                link.click();
+            }).catch(err => {
+                console.error('Gagal mengunduh gambar:', err);
+                alert('Gagal mengunduh gambar slip gaji.');
+            });
+        }
+
+        async function sendSlipToGmail() {
+            showStatus('email-status', 'Menyiapkan gambar untuk dikirim ke email...', 'success');
+            const element = document.getElementById('slip-pdf-wrapper');
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                windowWidth: 1000
+            }).then(async function(canvas) {
+                const imgDataUri = canvas.toDataURL('image/jpeg', 1.0);
+                const res = await callGAS('sendSlipGajiEmail', { pdfDataUri: imgDataUri });
+                if (res.success) { showStatus('email-status', res.message, 'success'); }
+                else { showStatus('email-status', res.message, 'error'); }
+            }).catch(err => {
+                showStatus('email-status', 'Gagal memproses gambar untuk email.', 'error');
+            });
+        }
+
+        function handleLogout() {
+            localStorage.getItem('app_user_session') && localStorage.removeItem('app_user_session');
+            lockHRAccess();
+            if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
