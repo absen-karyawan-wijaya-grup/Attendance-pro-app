@@ -463,12 +463,12 @@
             background: #111c3a; border: 2px solid #38bdf8; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; animation: pulseGlow 2s infinite ease-in-out;
         }
 
-        /* --- STYLING LOADING BAR NEON BLUE SEPERTI GAMBAR --- */
+        /* --- STYLING LOADING BAR REALISTIS & TAP TO DISMISS --- */
         .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 9, 20, 0.82); display: flex; align-items: center; justify-content: center; z-index: 30000; padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 9, 20, 0.82); display: flex; align-items: center; justify-content: center; z-index: 30000; padding: 20px; cursor: pointer;
         }
         .loading-container {
-            background: #0b1329; border: 1px solid #1e293b; border-radius: 20px; padding: 30px 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            background: #0b1329; border: 1px solid #1e293b; border-radius: 20px; padding: 30px 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); cursor: default;
         }
         .loading-text-wrapper {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: #60a5fa; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
@@ -477,7 +477,7 @@
             width: 100%; height: 12px; background: #020617; border-radius: 50px; border: 1px solid #1e293b; position: relative; overflow: hidden; padding: 2px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
         .loading-bar-fill {
-            height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #38bdf8); border-radius: 50px; box-shadow: 0 0 12px #38bdf8; transition: width 0.08s linear;
+            height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #38bdf8); border-radius: 50px; box-shadow: 0 0 12px #38bdf8; transition: width 0.15s ease-out;
         }
         .loading-status-msg {
             margin-top: 15px; font-size: 12px; color: #94a3b8; font-weight: 500; min-height: 18px;
@@ -485,10 +485,17 @@
         .loading-success-icon {
             font-size: 42px; color: #34d399; margin-bottom: 10px; animation: bounceIn 0.4s ease;
         }
+        .dismiss-hint {
+            margin-top: 15px; font-size: 10px; color: #64748b; font-style: italic; animation: fadeInOut 1.5s infinite alternate;
+        }
         @keyframes bounceIn {
             0% { transform: scale(0); opacity: 0; }
             70% { transform: scale(1.2); opacity: 1; }
             100% { transform: scale(1); }
+        }
+        @keyframes fadeInOut {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
         }
 
         /* Action Sheet Pilihan Kamera / Timemark */
@@ -1085,9 +1092,9 @@
         </div>
     </div>
 
-    <!-- MODAL LOADING BAR NEON BLUE & BLUR BACKGROUND -->
-    <div id="absensi-loading-modal" class="loading-overlay hidden">
-        <div class="loading-container">
+    <!-- MODAL LOADING BAR REALISTIS & TAP TO DISMISS -->
+    <div id="absensi-loading-modal" class="loading-overlay hidden" onclick="dismissLoadingModalIfComplete(event)">
+        <div class="loading-container" onclick="event.stopPropagation()">
             <div id="loading-spinner-area">
                 <div class="loading-text-wrapper">
                     <span style="letter-spacing: 0.5px;">loading</span>
@@ -1101,7 +1108,8 @@
             <div id="loading-success-area" class="hidden">
                 <div class="loading-success-icon"><i class="fa-solid fa-circle-check"></i></div>
                 <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Berhasil!</h3>
-                <p id="loading-success-desc" style="font-size: 11px; color: #94a3b8;"></p>
+                <p id="loading-success-desc" style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;"></p>
+                <div class="dismiss-hint">(Ketuk layar mana saja untuk menutup)</div>
             </div>
         </div>
     </div>
@@ -1153,6 +1161,7 @@
         let appNotifications = JSON.parse(localStorage.getItem('app_notifications') || '[]');
         let allowForcePulang = false;
         let activeKamarTarget = null;
+        let isAbsenCompleted = false; // Status apakah proses database sudah benar-benar selesai
 
         let tokenPhotos = {
             '14B': null,
@@ -1562,7 +1571,7 @@
             }
         }
 
-        // --- FUNGSI ANIMASI PROGRESS BAR LOADING DENGAN BLUR BACKGROUND ---
+        // --- FUNGSI ANIMASI LOADING BAR REALISTIS & SENTUH UNTUK TUTUP ---
         function runAbsenLoadingAnimation(onCompleteCallback) {
             const overlay = document.getElementById('absensi-loading-modal');
             const containerWrapper = document.getElementById('app-wrapper-container');
@@ -1571,6 +1580,8 @@
             const percentText = document.getElementById('loading-percentage-text');
             const fillBar = document.getElementById('loading-bar-fill-element');
             const msgText = document.getElementById('loading-status-message-text');
+
+            isAbsenCompleted = false; // Reset status
 
             // Aktifkan blur background & tampilkan modal loading
             containerWrapper.classList.add('is-blurred');
@@ -1583,38 +1594,52 @@
             fillBar.style.width = `${currentPercent}%`;
             msgText.innerText = "Absensi sedang dimuat...";
 
-            const intervalTime = 25; // Kecepatan loading (total sekitar 2.5 detik dari 1 ke 100)
-            const loadingInterval = setInterval(() => {
-                currentPercent += 1;
-                if (currentPercent > 100) currentPercent = 100;
+            // Animasi bertahap naik hingga 90% sambil menunggu proses server selesai
+            const progressInterval = setInterval(() => {
+                if (!isAbsenCompleted && currentPercent < 90) {
+                    currentPercent += Math.floor(Math.random() * 4) + 1; // Naik 1-4% secara natural
+                    if (currentPercent > 90) currentPercent = 90;
+                    percentText.innerText = `${currentPercent}%`;
+                    fillBar.style.width = `${currentPercent}%`;
 
-                percentText.innerText = `${currentPercent}%`;
-                fillBar.style.width = `${currentPercent}%`;
-
-                if (currentPercent === 40) {
-                    msgText.innerText = "Mengunggah foto & token listrik...";
-                } else if (currentPercent === 75) {
-                    msgText.innerText = "Menyimpan ke database presensi...";
-                }
-
-                if (currentPercent >= 100) {
-                    clearInterval(loadingInterval);
-                    
-                    // Selesai 100%, jalankan callback API GAS di latar belakang lalu tampilkan centang hijau
-                    if (onCompleteCallback) {
-                        onCompleteCallback((success, message) => {
-                            spinnerArea.classList.add('hidden');
-                            successArea.classList.remove('hidden');
-                            document.getElementById('loading-success-desc').innerText = message || "Presensi berhasil dicatat!";
-
-                            setTimeout(() => {
-                                overlay.classList.add('hidden');
-                                containerWrapper.classList.remove('is-blurred');
-                            }, 1400);
-                        });
+                    if (currentPercent === 35) {
+                        msgText.innerText = "Mengunggah foto & token listrik...";
+                    } else if (currentPercent === 70) {
+                        msgText.innerText = "Menyimpan ke database presensi...";
                     }
                 }
-            }, intervalTime);
+            }, 80);
+
+            // Jalankan API GAS di latar belakang
+            if (onCompleteCallback) {
+                onCompleteCallback((success, message) => {
+                    isAbsenCompleted = true; // Proses server sudah selesai
+                    clearInterval(progressInterval);
+
+                    // Lompat mulus ke 100%
+                    currentPercent = 100;
+                    percentText.innerText = `100%`;
+                    fillBar.style.width = `100%`;
+                    msgText.innerText = "Selesai!";
+
+                    setTimeout(() => {
+                        spinnerArea.classList.add('hidden');
+                        successArea.classList.remove('hidden');
+                        document.getElementById('loading-success-desc').innerText = message || "Presensi berhasil dicatat!";
+                        // Modal SEKARANG DIAM DI TEMPAT, menunggu user menyentuh layar bagian mana saja
+                    }, 400);
+                });
+            }
+        }
+
+        // Fungsi untuk menutup modal loading saat layar disentuh (hanya jika sudah 100% selesai)
+        function dismissLoadingModalIfComplete(event) {
+            if (!isAbsenCompleted) return; // Jangan tutup jika belum 100% selesai
+            const overlay = document.getElementById('absensi-loading-modal');
+            const containerWrapper = document.getElementById('app-wrapper-container');
+            
+            overlay.classList.add('hidden');
+            containerWrapper.classList.remove('is-blurred');
         }
 
         async function submitAbsen(tipe) {
@@ -1643,7 +1668,7 @@
                 tokens: tokenPhotos
             };
 
-            // Jalankan animasi loading bar dengan blur background
+            // Jalankan animasi loading bar realistis
             runAbsenLoadingAnimation(async (finishCallback) => {
                 const res = await callGAS('processAbsen', payloadData);
 
@@ -1654,7 +1679,8 @@
                     setTimeout(() => loadHistory31Days(), 1500);
                     finishCallback(true, res.message);
                 } else {
-                    // Jika gagal atau peringatan jam pulang, sembunyikan loading & hilangkan blur
+                    // Jika gagal atau peringatan jam pulang, langsung tutup loading & hilangkan blur
+                    isAbsenCompleted = true;
                     document.getElementById('absensi-loading-modal').classList.add('hidden');
                     document.getElementById('app-wrapper-container').classList.remove('is-blurred');
 
