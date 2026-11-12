@@ -56,6 +56,14 @@
             padding: 20px 20px 90px 20px;
             display: flex;
             flex-direction: column;
+            transition: filter 0.3s ease;
+        }
+
+        /* Efek Blur Background saat Loading Aktif */
+        .app-container.is-blurred {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
         }
 
         /* Top Bar Header */
@@ -330,7 +338,6 @@
             border-color: #38bdf8;
         }
 
-        /* Animasi Border Berdenyut Hijau ketika Foto Sudah Terisi */
         .token-preview-box.has-photo {
             border: 2px solid #10b981;
             animation: pulseGreenGlow 2s infinite ease-in-out;
@@ -456,6 +463,34 @@
             background: #111c3a; border: 2px solid #38bdf8; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; animation: pulseGlow 2s infinite ease-in-out;
         }
 
+        /* --- STYLING LOADING BAR NEON BLUE SEPERTI GAMBAR --- */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 9, 20, 0.82); display: flex; align-items: center; justify-content: center; z-index: 30000; padding: 20px;
+        }
+        .loading-container {
+            background: #0b1329; border: 1px solid #1e293b; border-radius: 20px; padding: 30px 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .loading-text-wrapper {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: #60a5fa; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
+        }
+        .loading-bar-track {
+            width: 100%; height: 12px; background: #020617; border-radius: 50px; border: 1px solid #1e293b; position: relative; overflow: hidden; padding: 2px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .loading-bar-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #2563eb, #38bdf8); border-radius: 50px; box-shadow: 0 0 12px #38bdf8; transition: width 0.08s linear;
+        }
+        .loading-status-msg {
+            margin-top: 15px; font-size: 12px; color: #94a3b8; font-weight: 500; min-height: 18px;
+        }
+        .loading-success-icon {
+            font-size: 42px; color: #34d399; margin-bottom: 10px; animation: bounceIn 0.4s ease;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
         /* Action Sheet Pilihan Kamera / Timemark */
         .action-sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 20000; padding: 0;
@@ -537,7 +572,7 @@
 
 <body>
 
-    <div class="app-container">
+    <div id="app-wrapper-container" class="app-container">
 
         <!-- ==================== FORM LOGIN KARYAWAN ==================== -->
         <div id="login-view" class="card" style="margin-top: auto; margin-bottom: auto;">
@@ -648,7 +683,7 @@
                     </button>
                 </div>
 
-                <!-- WAJIB FOTO TOKEN LISTRIK DENGAN LABEL TOKEN KAMAR & INDIKATOR BERDENYUT HIJAU -->
+                <!-- WAJIB FOTO TOKEN LISTRIK -->
                 <div class="token-section-box">
                     <h4 style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;"><i class="fa-solid fa-bolt text-yellow-400"></i> Wajib Foto Token Listrik</h4>
                     <p style="font-size: 10px; color: #38bdf8; margin-bottom: 2px; font-weight: 600;">⚡ Wajib foto token pagi sebelum absen masuk</p>
@@ -708,7 +743,7 @@
                 <div id="absen-status" class="status-msg hidden"></div>
             </div>
 
-            <!-- TAB 2: HR MENU (SLIP GAJI & HISTORY) -->
+            <!-- TAB 2: HR MENU -->
             <div id="tab-hr" class="tab-content card hidden">
                 <div id="hr-login-box">
                     <div style="text-align: center; margin-bottom: 16px;">
@@ -740,8 +775,6 @@
                 </div>
 
                 <div id="hr-dashboard-box" class="hidden">
-                    
-                    <!-- KONTROL PILIH MINGGU SLIP GAJI -->
                     <div style="text-align: center; margin-bottom: 12px;">
                         <h3 style="font-size: 16px;">Slip Gaji Mingguan</h3>
                         <p style="font-size: 11px; color: #38bdf8; margin-bottom: 8px;" id="slip-periode-label">Periode Kerja</p>
@@ -752,117 +785,110 @@
                         </div>
                     </div>
 
-                    <!-- KONTAINER SLIP GAJI -->
                     <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 14px; background: #ffffff; border-radius: 12px; padding: 4px;">
                         <div id="slip-pdf-wrapper" style="background: white; color: #0f172a; padding: 28px 32px; width: 1000px; min-width: 1000px; display: flex; flex-direction: column; justify-content: flex-start; gap: 18px; box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0 auto;">
                             
-                            <!-- Header Slip -->
                             <table style="width: 100%; border-collapse: collapse; border: none; margin-bottom: 2px;">
                                 <tr>
                                     <td style="width: 30%; text-align: left; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0;">
-                                        <h1 style="font-size: 20px; font-weight: bold; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">SLIP GAJI</h1>
+                                        <h1 style="font-size: 20px; font-weight: bold; color: #0f172a; margin: 0; text-transform: uppercase;">SLIP GAJI</h1>
                                         <p style="font-size: 13px; color: #475569; margin: 2px 0 0 0; font-weight: 500;" id="slip-tgl-label">01 November 2026</p>
                                     </td>
                                     <td style="width: 40%; text-align: center; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0;">
-                                        <span style="font-size: 25px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; text-transform: uppercase;">CV. WIJAYA GRUP</span>
+                                        <span style="font-size: 25px; font-weight: 800; color: #0f172a; text-transform: uppercase;">CV. WIJAYA GRUP</span>
                                     </td>
-                                    <td style="width: 30%; text-align: right; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0; font-size: 12px; color: #64748b; line-height: 1.3;">
+                                    <td style="width: 30%; text-align: right; vertical-align: middle; border: none; border-bottom: 2px solid #0f172a; padding: 0 0 12px 0; font-size: 12px; color: #64748b;">
                                         <p style="font-weight: 600; color: #334155; margin: 0;">Payroll Doc</p>
                                         <p style="margin: 0;">Confidential</p>
                                     </td>
                                 </tr>
                             </table>
 
-                            <!-- Info Karyawan -->
                             <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; font-size: 13px; text-align: center;">
                                 <tr>
-                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; width: 15%; color: #334155; vertical-align: middle !important; text-align: center !important;">Nama</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; width: 35%; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;" id="slip-nama">Muhammad Fejri Febriyan</td>
-                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; width: 15%; color: #334155; vertical-align: middle !important; text-align: center !important;">Minggu</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; width: 35%; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;" id="slip-minggu-ke">-</td>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; width: 15%;">Nama</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; width: 35%; color: #0f172a; font-weight: 600;" id="slip-nama">Muhammad Fejri Febriyan</td>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; width: 15%;">Minggu</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; width: 35%; color: #0f172a; font-weight: 600;" id="slip-minggu-ke">-</td>
                                 </tr>
                                 <tr>
-                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; color: #334155; vertical-align: middle !important; text-align: center !important;">Jabatan</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;">Staff</td>
-                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px; color: #334155; vertical-align: middle !important; text-align: center !important;">Periode</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; color: #0f172a; font-weight: 600; vertical-align: middle !important; text-align: center !important;" id="slip-periode">25 Oct 2026 - 31 Oct 2026</td>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px;">Jabatan</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; color: #0f172a; font-weight: 600;">Staff</td>
+                                    <td style="border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; padding: 10px 14px;">Periode</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 10px 14px; color: #0f172a; font-weight: 600;" id="slip-periode">25 Oct 2026 - 31 Oct 2026</td>
                                 </tr>
                             </table>
 
-                            <!-- Bagian Kehadiran -->
                             <div>
-                                <div style="background: #0f172a; color: white; font-size: 12px; font-weight: bold; padding: 8px 14px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
+                                <div style="background: #0f172a; color: white; font-size: 12px; font-weight: bold; padding: 8px 14px; text-transform: uppercase; text-align: center;">
                                     Hari Kerja & Kehadiran
                                 </div>
                                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; font-size: 11.5px; text-align: center;">
                                     <thead>
                                         <tr style="background: #f1f5f9; color: #334155; font-weight: 700;">
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 4%; vertical-align: middle !important; text-align: center !important;">NO</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 6px; width: 20%; vertical-align: middle !important; text-align: center !important;">NAMA</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 8%; vertical-align: middle !important; text-align: center !important;">JABATAN</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 18%; vertical-align: middle !important; text-align: center !important;">PERIODE</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; vertical-align: middle !important; text-align: center !important;">MASUK</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; vertical-align: middle !important; text-align: center !important;">IZIN</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; vertical-align: middle !important; text-align: center !important; background: #ffffff;">SAKIT</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; background: #fee2e2; color: #991b1b; vertical-align: middle !important; text-align: center !important;">ALFA</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 5%; background: #fee2e2; color: #991b1b; vertical-align: middle !important; text-align: center !important;">TELAT</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; width: 6%; background: #fee2e2; color: #991b1b; vertical-align: middle !important; text-align: center !important;">NO OUT</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 9%; vertical-align: middle !important; text-align: center !important; white-space: nowrap;">POINT</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px; width: 9%; vertical-align: middle !important; text-align: center !important; white-space: nowrap;">KOMISI</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px;">NO</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 6px;">NAMA</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px;">JABATAN</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px;">PERIODE</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px;">MASUK</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px;">IZIN</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px;">SAKIT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; background: #fee2e2; color: #991b1b;">ALFA</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; background: #fee2e2; color: #991b1b;">TELAT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 2px; background: #fee2e2; color: #991b1b;">NO OUT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px;">POINT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 9px 4px;">KOMISI</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr style="color: #1e293b;">
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important;">1</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 6px; vertical-align: middle !important; text-align: center !important; font-weight: 600; font-size: 11px; line-height: 1.3;" id="slip-nama-row">Muhammad Fejri Febriyan</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 600;">Staff</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 600;" id="slip-periode-row">25 Oct 2026 - 31 Oct 2026</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; font-weight: 700;" id="slip-hk">2 Hari</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; font-weight: 700;" id="slip-izin">0 Hari</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; font-weight: 700; background: #ffffff;" id="slip-sakit">0 Hari</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-alfa">0 Hari</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-telat">1 Kali</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; vertical-align: middle !important; text-align: center !important; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-no-pulang">1 Kali</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 700; white-space: nowrap;" id="slip-point">0 Point</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; vertical-align: middle !important; text-align: center !important; font-weight: 700; white-space: nowrap;" id="slip-tamu">0 Tamu</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px;">1</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 6px; font-weight: 600;" id="slip-nama-row">Muhammad Fejri Febriyan</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; font-weight: 600;">Staff</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; font-weight: 600;" id="slip-periode-row">25 Oct 2026 - 31 Oct 2026</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; font-weight: 700;" id="slip-hk">2 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; font-weight: 700;" id="slip-izin">0 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; font-weight: 700;" id="slip-sakit">0 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-alfa">0 Hari</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-telat">1 Kali</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 2px; background: #fee2e2; color: #991b1b; font-weight: 700;" id="slip-no-pulang">1 Kali</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; font-weight: 700;" id="slip-point">0 Point</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 10px 4px; font-weight: 700;" id="slip-tamu">0 Tamu</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <!-- Bagian Upah & Potongan -->
                             <div>
-                                <div style="background: #0f172a; color: white; font-size: 12px; font-weight: bold; padding: 8px 14px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
+                                <div style="background: #0f172a; color: white; font-size: 12px; font-weight: bold; padding: 8px 14px; text-transform: uppercase; text-align: center;">
                                     Rincian Upah, Potongan & Hasil Akhir
                                 </div>
                                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; font-size: 13px; text-align: center;">
                                     <thead>
                                         <tr style="background: #f1f5f9; color: #334155; font-weight: 700;">
-                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">UPAH POKOK</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">RP POINT</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">RP KOMISI</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; vertical-align: middle !important; text-align: center !important;">TOTAL POTONGAN</th>
-                                            <th style="border: 1px solid #cbd5e1; padding: 10px; width: 20%; font-weight: bold; color: #0f172a; vertical-align: middle !important; text-align: center !important;">GAJI BERSIH</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px;">UPAH POKOK</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px;">RP POINT</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px;">RP KOMISI</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px;">TOTAL POTONGAN</th>
+                                            <th style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #0f172a;">GAJI BERSIH</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr style="color: #1e293b; font-weight: 700;">
-                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important;" id="slip-total-hk">Rp100.000</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important;" id="slip-total-point">Rp0</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important;" id="slip-total-komisi">Rp0</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important; color: #dc2626; background: #fef2f2;" id="slip-total-denda">Rp40.000</td>
-                                            <td style="border: 1px solid #cbd5e1; padding: 12px; vertical-align: middle !important; text-align: center !important; font-weight: 800; color: #0f172a; font-size: 15px;" id="slip-grand-total">Rp60.000</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px;" id="slip-total-hk">Rp100.000</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px;" id="slip-total-point">Rp0</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px;" id="slip-total-komisi">Rp0</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; color: #dc2626; background: #fef2f2;" id="slip-total-denda">Rp40.000</td>
+                                            <td style="border: 1px solid #cbd5e1; padding: 12px; font-weight: 800; color: #0f172a; font-size: 15px;" id="slip-grand-total">Rp60.000</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <!-- Kotak Catatan Potongan -->
                             <div style="border: 1px solid #cbd5e1; background: #ffffff; padding: 10px 14px; font-size: 12.5px; color: #1e293b; font-weight: 600;">
                                 <span id="slip-rincian-potongan">Rincian Potongan: Tidak ada potongan</span>
                             </div>
 
-                            <!-- Tanda Tangan -->
                             <table style="width: 100%; border-collapse: collapse; border: none; font-size: 12.5px; text-align: center; margin-top: 10px;">
                                 <tr>
                                     <td style="width: 25%; vertical-align: top; border: none; padding: 0 5px;">
@@ -892,7 +918,6 @@
                         </div>
                     </div>
 
-                    <!-- Tombol Aksi Gambar JPG & Email -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;">
                         <button class="btn" style="background: #10b981;" onclick="downloadSlipJPG()">
                             <i class="fa-solid fa-file-image"></i> Unduh Gambar (JPG)
@@ -904,7 +929,6 @@
 
                     <div id="email-status" class="status-msg hidden"></div>
 
-                    <!-- CARD PREVIEW FOTO TOKEN LISTRIK (RIWAYAT 30 HARI) DENGAN FULL-SCREEN KLIK -->
                     <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="font-size: 13px; color: #38bdf8;"><i class="fa-solid fa-bolt"></i> Preview Foto Token Listrik (30 Hari)</h3>
@@ -912,12 +936,9 @@
                         </div>
                         <p style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;" id="token-history-date-label">Menampilkan data hari ini</p>
                         
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="token-history-preview-container">
-                            <!-- Diisi dinamis via JS -->
-                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="token-history-preview-container"></div>
                     </div>
 
-                    <!-- ==================== HISTORY 31 HARI ==================== -->
                     <hr style="border-color: #334155; margin-bottom: 15px;">
                     <h3 style="font-size: 14px; margin-bottom: 12px; text-align: center;">Riwayat Presensi (31 Hari)</h3>
 
@@ -1064,6 +1085,27 @@
         </div>
     </div>
 
+    <!-- MODAL LOADING BAR NEON BLUE & BLUR BACKGROUND -->
+    <div id="absensi-loading-modal" class="loading-overlay hidden">
+        <div class="loading-container">
+            <div id="loading-spinner-area">
+                <div class="loading-text-wrapper">
+                    <span style="letter-spacing: 0.5px;">loading</span>
+                    <span id="loading-percentage-text" style="font-weight: 700; color: #38bdf8;">1%</span>
+                </div>
+                <div class="loading-bar-track">
+                    <div id="loading-bar-fill-element" class="loading-bar-fill"></div>
+                </div>
+                <div id="loading-status-message-text" class="loading-status-msg">Absensi sedang dimuat...</div>
+            </div>
+            <div id="loading-success-area" class="hidden">
+                <div class="loading-success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Berhasil!</h3>
+                <p id="loading-success-desc" style="font-size: 11px; color: #94a3b8;"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- ACTION SHEET PILIHAN KAMERA / TIMEMARK -->
     <div id="token-action-sheet" class="action-sheet-overlay hidden" onclick="closeTokenActionSheet()">
         <div class="action-sheet-card" onclick="event.stopPropagation()">
@@ -1112,7 +1154,6 @@
         let allowForcePulang = false;
         let activeKamarTarget = null;
 
-        // Penyimpanan data foto token lokal sesi berjalan
         let tokenPhotos = {
             '14B': null,
             '15': null,
@@ -1173,7 +1214,6 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // Fungsi Action Sheet Pilihan Kamera / Timemark
         function openTokenActionSheet(kamar) {
             activeKamarTarget = kamar;
             document.getElementById('sheet-title').innerText = `Foto Token Kamar ${kamar}`;
@@ -1194,7 +1234,6 @@
             window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.jeylab.timemark;end;";
         }
 
-        // Fungsi Fullscreen Preview Gambar Token
         function openFullscreenImage(imgUrl) {
             if (!imgUrl || imgUrl === "-") return;
             const modal = document.getElementById('image-fullscreen-modal');
@@ -1332,7 +1371,6 @@
             }).catch(err => alert("Akses kamera ditolak atau diblokir."));
         }
 
-        // Handler Tangkap File dari Kamera Bawaan dengan Indikator Berdenyut Hijau
         function handleTokenFileSelected(event) {
             const file = event.target.files[0];
             if (!file || !activeKamarTarget) return;
@@ -1370,7 +1408,6 @@
                     const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
                     tokenPhotos[kamarNum] = compressedDataUrl;
 
-                    // Update UI Kotak Preview menjadi Border Berdenyut Hijau
                     const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
                     const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
                     const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
@@ -1381,7 +1418,6 @@
                         imgEl.src = compressedDataUrl;
                         imgEl.classList.remove('hidden');
 
-                        // Tambahkan badge sukses jika belum ada
                         if (!boxEl.querySelector('.token-badge-success')) {
                             const badge = document.createElement('div');
                             badge.className = 'token-badge-success';
@@ -1393,7 +1429,7 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-            event.target.value = ''; // Reset input
+            event.target.value = '';
         }
 
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
@@ -1526,6 +1562,61 @@
             }
         }
 
+        // --- FUNGSI ANIMASI PROGRESS BAR LOADING DENGAN BLUR BACKGROUND ---
+        function runAbsenLoadingAnimation(onCompleteCallback) {
+            const overlay = document.getElementById('absensi-loading-modal');
+            const containerWrapper = document.getElementById('app-wrapper-container');
+            const spinnerArea = document.getElementById('loading-spinner-area');
+            const successArea = document.getElementById('loading-success-area');
+            const percentText = document.getElementById('loading-percentage-text');
+            const fillBar = document.getElementById('loading-bar-fill-element');
+            const msgText = document.getElementById('loading-status-message-text');
+
+            // Aktifkan blur background & tampilkan modal loading
+            containerWrapper.classList.add('is-blurred');
+            spinnerArea.classList.remove('hidden');
+            successArea.classList.add('hidden');
+            overlay.classList.remove('hidden');
+
+            let currentPercent = 1;
+            percentText.innerText = `${currentPercent}%`;
+            fillBar.style.width = `${currentPercent}%`;
+            msgText.innerText = "Absensi sedang dimuat...";
+
+            const intervalTime = 25; // Kecepatan loading (total sekitar 2.5 detik dari 1 ke 100)
+            const loadingInterval = setInterval(() => {
+                currentPercent += 1;
+                if (currentPercent > 100) currentPercent = 100;
+
+                percentText.innerText = `${currentPercent}%`;
+                fillBar.style.width = `${currentPercent}%`;
+
+                if (currentPercent === 40) {
+                    msgText.innerText = "Mengunggah foto & token listrik...";
+                } else if (currentPercent === 75) {
+                    msgText.innerText = "Menyimpan ke database presensi...";
+                }
+
+                if (currentPercent >= 100) {
+                    clearInterval(loadingInterval);
+                    
+                    // Selesai 100%, jalankan callback API GAS di latar belakang lalu tampilkan centang hijau
+                    if (onCompleteCallback) {
+                        onCompleteCallback((success, message) => {
+                            spinnerArea.classList.add('hidden');
+                            successArea.classList.remove('hidden');
+                            document.getElementById('loading-success-desc').innerText = message || "Presensi berhasil dicatat!";
+
+                            setTimeout(() => {
+                                overlay.classList.add('hidden');
+                                containerWrapper.classList.remove('is-blurred');
+                            }, 1400);
+                        });
+                    }
+                }
+            }, intervalTime);
+        }
+
         async function submitAbsen(tipe) {
             if (!currentLat || !currentLng) { showStatus('absen-status', 'Gagal: GPS belum terdeteksi!', 'error'); return; }
             if (currentDistance > MAX_ALLOWED_RADIUS) { showStatus('absen-status', `Gagal: Posisi Anda ${currentDistance.toFixed(1)} m dari lokasi!`, 'error'); return; }
@@ -1539,7 +1630,6 @@
 
             const actionBtn = document.querySelector(tipe === 'MASUK' ? '.btn-absen-masuk' : '.btn-absen-pulang');
             if (actionBtn) actionBtn.disabled = true;
-            showStatus('absen-status', 'Merekam presensi & token...', 'success');
 
             let force = (tipe === 'PULANG' && allowForcePulang);
             const photoData = capturePhotoWithWatermark();
@@ -1553,25 +1643,32 @@
                 tokens: tokenPhotos
             };
 
-            const res = await callGAS('processAbsen', payloadData);
+            // Jalankan animasi loading bar dengan blur background
+            runAbsenLoadingAnimation(async (finishCallback) => {
+                const res = await callGAS('processAbsen', payloadData);
 
-            if (res.success) {
-                allowForcePulang = false;
-                showStatus('absen-status', res.message, 'success');
-                showCustomModal(`Presensi ${tipe} Berhasil`, res.message, 'fa-circle-check', '#38bdf8');
-                addNotification(`Absen ${tipe} Berhasil`, `Pencatatan absen ${tipe.toLowerCase()} & token sukses (${res.message}).`, new Date().toLocaleTimeString('id-ID', {hour12: false}), res.message.includes('Terlambat') ? 'Terlambat' : 'Berhasil');
-                setTimeout(() => loadHistory31Days(), 1500);
-            } else {
-                showStatus('absen-status', res.message, 'error');
-                if (res.isWarningOnly) {
-                    allowForcePulang = true;
-                    showCustomModal("Peringatan Jam Pulang", res.message, 'fa-triangle-exclamation', '#f59e0b');
-                } else {
+                if (res.success) {
                     allowForcePulang = false;
-                    showCustomModal("Gagal Presensi", res.message, 'fa-circle-xmark', '#ef4444');
+                    showStatus('absen-status', res.message, 'success');
+                    addNotification(`Absen ${tipe} Berhasil`, `Pencatatan absen ${tipe.toLowerCase()} & token sukses (${res.message}).`, new Date().toLocaleTimeString('id-ID', {hour12: false}), res.message.includes('Terlambat') ? 'Terlambat' : 'Berhasil');
+                    setTimeout(() => loadHistory31Days(), 1500);
+                    finishCallback(true, res.message);
+                } else {
+                    // Jika gagal atau peringatan jam pulang, sembunyikan loading & hilangkan blur
+                    document.getElementById('absensi-loading-modal').classList.add('hidden');
+                    document.getElementById('app-wrapper-container').classList.remove('is-blurred');
+
+                    showStatus('absen-status', res.message, 'error');
+                    if (res.isWarningOnly) {
+                        allowForcePulang = true;
+                        showCustomModal("Peringatan Jam Pulang", res.message, 'fa-triangle-exclamation', '#f59e0b');
+                    } else {
+                        allowForcePulang = false;
+                        showCustomModal("Gagal Presensi", res.message, 'fa-circle-xmark', '#ef4444');
+                    }
+                    if (actionBtn) actionBtn.disabled = false;
                 }
-                if (actionBtn) actionBtn.disabled = false;
-            }
+            });
         }
 
         async function submitIzin() {
