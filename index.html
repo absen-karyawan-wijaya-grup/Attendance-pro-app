@@ -59,14 +59,12 @@
             transition: filter 0.3s ease;
         }
 
-        /* Efek Blur Background saat Loading Aktif */
         .app-container.is-blurred {
             filter: blur(8px);
             pointer-events: none;
             user-select: none;
         }
 
-        /* Top Bar Header */
         .app-topbar {
             display: flex;
             justify-content: space-between;
@@ -137,7 +135,6 @@
             color: #fff;
         }
 
-        /* Live Digital Clock (24 Jam) */
         .clock-display {
             text-align: center;
             margin-bottom: 20px;
@@ -158,7 +155,6 @@
             font-weight: 500;
         }
 
-        /* Circular Face Scanning Area */
         .face-scan-wrapper {
             display: flex;
             flex-direction: column;
@@ -285,7 +281,6 @@
             font-weight: 700;
         }
 
-        /* Token Listrik Section */
         .token-section-box {
             background: #1e293b;
             border: 1px solid #334155;
@@ -316,7 +311,6 @@
             margin-bottom: 6px;
         }
 
-        /* Styling Kotak Preview Token Profesional & Border Berdenyut Hijau jika sudah foto */
         .token-preview-box {
             width: 100%;
             height: 80px;
@@ -463,7 +457,6 @@
             background: #111c3a; border: 2px solid #38bdf8; border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; text-align: center; animation: pulseGlow 2s infinite ease-in-out;
         }
 
-        /* --- STYLING LOADING BAR REALISTIS & TAP TO DISMISS --- */
         .loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 9, 20, 0.82); display: flex; align-items: center; justify-content: center; z-index: 30000; padding: 20px; cursor: pointer;
         }
@@ -498,7 +491,6 @@
             to { opacity: 1; }
         }
 
-        /* Action Sheet Pilihan Kamera / Timemark */
         .action-sheet-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 20000; padding: 0;
         }
@@ -510,7 +502,6 @@
             to { transform: translateY(0); }
         }
 
-        /* Modal Fullscreen Preview Gambar Token */
         .image-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 15px;
         }
@@ -535,15 +526,7 @@
         .stat-info .value { font-size: 14px; font-weight: 700; color: #fff; }
 
         .notif-card-item {
-            background: #0f172a;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            position: relative;
-            touch-action: pan-y;
-            user-select: none;
-            overflow: hidden;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; position: relative; touch-action: pan-y; user-select: none; overflow: hidden; transition: transform 0.2s ease, opacity 0.2s ease;
         }
         
         .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
@@ -680,7 +663,7 @@
                     <span class="location-value" id="gps-coords-text">LOCATION FOUND</span>
                 </div>
 
-                <!-- TOMBOL ABSEN MASUK & PULANG DI ATAS -->
+                <!-- TOMBOL ABSEN MASUK & PULANG -->
                 <div class="action-grid" style="margin-bottom: 15px;">
                     <button class="btn-absen btn-absen-masuk" onclick="submitAbsen('MASUK')">
                         <i class="fa-solid fa-right-to-bracket"></i> Absen Masuk
@@ -744,7 +727,6 @@
                     </div>
                 </div>
 
-                <!-- Hidden file input untuk direct camera capture -->
                 <input type="file" id="hidden-token-input" accept="image/*" capture="environment" class="hidden" onchange="handleTokenFileSelected(event)">
 
                 <div id="absen-status" class="status-msg hidden"></div>
@@ -936,6 +918,7 @@
 
                     <div id="email-status" class="status-msg hidden"></div>
 
+                    <!-- PREVIEW FOTO TOKEN LISTRIK (30 HARI) -->
                     <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="font-size: 13px; color: #38bdf8;"><i class="fa-solid fa-bolt"></i> Preview Foto Token Listrik (30 Hari)</h3>
@@ -945,6 +928,24 @@
                         
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="token-history-preview-container"></div>
                     </div>
+
+                    <!-- ==================== CARD BARU: AUDIT KAMAR & REKAP SELISIH TOKEN (SHIFT 1) ==================== -->
+                    <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <h3 style="font-size: 13px; color: #38bdf8; font-weight: 700;"><i class="fa-solid fa-calculator"></i> AUDIT KAMAR & REKAP SELISIH TOKEN</h3>
+                                <p style="font-size: 9.5px; color: #94a3b8;">Shift 1 (10:00 - 22:00) | 1 Jam = 0.79 kWh</p>
+                            </div>
+                            <!-- Filter Kalender Kecil -->
+                            <input type="date" id="picker-audit-kamar" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 10px;" onchange="loadAuditKamarData(this.value)">
+                        </div>
+                        <div style="font-size: 10px; color: #10b981; margin-bottom: 12px; font-weight: 600;" id="audit-kamar-date-label">Menampilkan data harian hari ini</div>
+
+                        <div style="display: flex; flex-direction: column; gap: 8px;" id="audit-kamar-list-container">
+                            <!-- Diisi dinamis via JS -->
+                        </div>
+                    </div>
+                    <!-- ============================================================================================== -->
 
                     <hr style="border-color: #334155; margin-bottom: 15px;">
                     <h3 style="font-size: 14px; margin-bottom: 12px; text-align: center;">Riwayat Presensi (31 Hari)</h3>
@@ -1092,7 +1093,7 @@
         </div>
     </div>
 
-    <!-- MODAL LOADING BAR REALISTIS & TAP TO DISMISS -->
+    <!-- MODAL LOADING BAR -->
     <div id="absensi-loading-modal" class="loading-overlay hidden" onclick="dismissLoadingModalIfComplete(event)">
         <div class="loading-container" onclick="event.stopPropagation()">
             <div id="loading-spinner-area">
@@ -1114,7 +1115,7 @@
         </div>
     </div>
 
-    <!-- ACTION SHEET PILIHAN KAMERA / TIMEMARK -->
+    <!-- ACTION SHEET KAMERA -->
     <div id="token-action-sheet" class="action-sheet-overlay hidden" onclick="closeTokenActionSheet()">
         <div class="action-sheet-card" onclick="event.stopPropagation()">
             <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 14px;" id="sheet-title">Foto Token Kamar</h3>
@@ -1132,7 +1133,7 @@
         </div>
     </div>
 
-    <!-- MODAL FULL-SCREEN PREVIEW GAMBAR -->
+    <!-- MODAL PREVIEW GAMBAR -->
     <div id="image-fullscreen-modal" class="image-modal-overlay hidden" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <img id="fullscreen-img-element" src="" alt="Full Preview">
@@ -1144,7 +1145,7 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbynqW26D1FDxbNmv3bHgXL4cV_egclylnJ-LVHT1tk0s8VizI6luEEJ4W34_47mRithKA/exec'; // Ganti dengan URL deployment Web App GAS Anda
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGN9C1tPQjNDUtlleUWr3DMy9s_79rmvwcmDyw39cTkPqU_n5Eir9Hzmg-m66PGA0UKg/exec'; // Ganti dengan URL deployment Web App GAS Anda
 
         const TARGET_LAT = -6.716420;
         const TARGET_LNG = 108.536437;
@@ -1161,7 +1162,7 @@
         let appNotifications = JSON.parse(localStorage.getItem('app_notifications') || '[]');
         let allowForcePulang = false;
         let activeKamarTarget = null;
-        let isAbsenCompleted = false; // Status apakah proses database sudah benar-benar selesai
+        let isAbsenCompleted = false;
 
         let tokenPhotos = {
             '14B': null,
@@ -1286,67 +1287,16 @@
             }
             list.innerHTML = appNotifications.map((n, index) => `
                 <div class="notif-card-item" id="notif-item-${index}" 
-                     style="border-left: 4px solid ${n.status.toLowerCase().includes('terlambat') || n.status.toLowerCase().includes('alfa') ? '#ef4444' : '#10b981'};"
-                     data-index="${index}"
-                     ontouchstart="handleTouchStart(event, ${index})"
-                     ontouchmove="handleTouchMove(event, ${index})"
-                     ontouchend="handleTouchEnd(event, ${index})"
-                     onmousedown="handleTouchStart(event, ${index})"
-                     onmousemove="handleTouchMove(event, ${index})"
-                     onmouseup="handleTouchEnd(event, ${index})"
-                     onmouseleave="handleTouchEnd(event, ${index})">
+                     style="border-left: 4px solid ${n.status.toLowerCase().includes('terlambat') || n.status.toLowerCase().includes('alfa') ? '#ef4444' : '#10b981'};">
                     <div style="font-weight: bold; color: #fff; display: flex; justify-content: space-between;">
                         <span>${n.title}</span><span style="font-size: 10px; color: #94a3b8;">${n.date}</span>
                     </div>
                     <div style="color: #cbd5e1;">${n.message}</div>
                     <div style="font-size: 10px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
                         <span>🕒 Jam: <b>${n.time} WIB</b> | Status: <b>${n.status}</b></span>
-                        <span style="font-size: 8px; color: #64748b; font-style: italic;">← Geser hapus →</span>
                     </div>
                 </div>
             `).join('');
-        }
-
-        let swipeData = { index: null, startX: 0, currentX: 0, isDragging: false };
-
-        function handleTouchStart(e, index) {
-            swipeData.index = index;
-            swipeData.startX = e.touches ? e.touches[0].clientX : e.clientX;
-            swipeData.isDragging = true;
-        }
-
-        function handleTouchMove(e, index) {
-            if (!swipeData.isDragging || swipeData.index !== index) return;
-            const currentXCoord = e.touches ? e.touches[0].clientX : e.clientX;
-            swipeData.currentX = currentXCoord - swipeData.startX;
-            const item = document.getElementById(`notif-item-${index}`);
-            if (item) {
-                item.style.transform = `translateX(${swipeData.currentX}px)`;
-                item.style.opacity = `${Math.max(0.2, 1 - Math.abs(swipeData.currentX) / 200)}`;
-            }
-        }
-
-        function handleTouchEnd(e, index) {
-            if (!swipeData.isDragging || swipeData.index !== index) return;
-            const item = document.getElementById(`notif-item-${index}`);
-            if (item) {
-                if (Math.abs(swipeData.currentX) > 80) {
-                    item.style.transform = `translateX(${swipeData.currentX > 0 ? 350 : -350}px)`;
-                    item.style.opacity = '0';
-                    setTimeout(() => {
-                        appNotifications.splice(index, 1);
-                        localStorage.setItem('app_notifications', JSON.stringify(appNotifications));
-                        updateNotificationBadge();
-                        renderNotificationList();
-                    }, 200);
-                } else {
-                    item.style.transform = 'translateX(0px)';
-                    item.style.opacity = '1';
-                }
-            }
-            swipeData.isDragging = false;
-            swipeData.index = null;
-            swipeData.currentX = 0;
         }
 
         function closeNotifications() { document.getElementById('notif-modal').classList.add('hidden'); }
@@ -1488,7 +1438,7 @@
                 isHRAuthenticated = true;
                 document.getElementById('hr-login-box').classList.add('hidden');
                 document.getElementById('hr-dashboard-box').classList.remove('hidden');
-                loadSlipGaji(); loadHistory31Days(); loadTokenHistoryByDate('');
+                loadSlipGaji(); loadHistory31Days(); loadTokenHistoryByDate(''); loadAuditKamarData('');
             } else {
                 showStatus('hr-login-status', 'Kredensial Admin HR Salah!', 'error');
             }
@@ -1571,7 +1521,6 @@
             }
         }
 
-        // --- FUNGSI ANIMASI LOADING BAR REALISTIS & SENTUH UNTUK TUTUP ---
         function runAbsenLoadingAnimation(onCompleteCallback) {
             const overlay = document.getElementById('absensi-loading-modal');
             const containerWrapper = document.getElementById('app-wrapper-container');
@@ -1581,9 +1530,8 @@
             const fillBar = document.getElementById('loading-bar-fill-element');
             const msgText = document.getElementById('loading-status-message-text');
 
-            isAbsenCompleted = false; // Reset status
+            isAbsenCompleted = false;
 
-            // Aktifkan blur background & tampilkan modal loading
             containerWrapper.classList.add('is-blurred');
             spinnerArea.classList.remove('hidden');
             successArea.classList.add('hidden');
@@ -1594,10 +1542,9 @@
             fillBar.style.width = `${currentPercent}%`;
             msgText.innerText = "Absensi sedang dimuat...";
 
-            // Animasi bertahap naik hingga 90% sambil menunggu proses server selesai
             const progressInterval = setInterval(() => {
                 if (!isAbsenCompleted && currentPercent < 90) {
-                    currentPercent += Math.floor(Math.random() * 4) + 1; // Naik 1-4% secara natural
+                    currentPercent += Math.floor(Math.random() * 4) + 1;
                     if (currentPercent > 90) currentPercent = 90;
                     percentText.innerText = `${currentPercent}%`;
                     fillBar.style.width = `${currentPercent}%`;
@@ -1610,13 +1557,11 @@
                 }
             }, 80);
 
-            // Jalankan API GAS di latar belakang
             if (onCompleteCallback) {
                 onCompleteCallback((success, message) => {
-                    isAbsenCompleted = true; // Proses server sudah selesai
+                    isAbsenCompleted = true;
                     clearInterval(progressInterval);
 
-                    // Lompat mulus ke 100%
                     currentPercent = 100;
                     percentText.innerText = `100%`;
                     fillBar.style.width = `100%`;
@@ -1626,15 +1571,13 @@
                         spinnerArea.classList.add('hidden');
                         successArea.classList.remove('hidden');
                         document.getElementById('loading-success-desc').innerText = message || "Presensi berhasil dicatat!";
-                        // Modal SEKARANG DIAM DI TEMPAT, menunggu user menyentuh layar bagian mana saja
                     }, 400);
                 });
             }
         }
 
-        // Fungsi untuk menutup modal loading saat layar disentuh (hanya jika sudah 100% selesai)
         function dismissLoadingModalIfComplete(event) {
-            if (!isAbsenCompleted) return; // Jangan tutup jika belum 100% selesai
+            if (!isAbsenCompleted) return;
             const overlay = document.getElementById('absensi-loading-modal');
             const containerWrapper = document.getElementById('app-wrapper-container');
             
@@ -1646,7 +1589,6 @@
             if (!currentLat || !currentLng) { showStatus('absen-status', 'Gagal: GPS belum terdeteksi!', 'error'); return; }
             if (currentDistance > MAX_ALLOWED_RADIUS) { showStatus('absen-status', `Gagal: Posisi Anda ${currentDistance.toFixed(1)} m dari lokasi!`, 'error'); return; }
 
-            // Validasi wajib foto keempat token listrik sebelum absen
             if (!tokenPhotos['14B'] || !tokenPhotos['15'] || !tokenPhotos['16'] || !tokenPhotos['19']) {
                 showStatus('absen-status', 'Gagal: Wajib foto token listrik kamar 14B, 15, 16, dan 19 terlebih dahulu!', 'error');
                 showCustomModal("Foto Token Belum Lengkap", "Anda wajib mengambil foto meteran token listrik untuk semua kamar (14B, 15, 16, 19) secara real-time sebelum melakukan presensi.", 'fa-triangle-exclamation', '#f59e0b');
@@ -1668,7 +1610,6 @@
                 tokens: tokenPhotos
             };
 
-            // Jalankan animasi loading bar realistis
             runAbsenLoadingAnimation(async (finishCallback) => {
                 const res = await callGAS('processAbsen', payloadData);
 
@@ -1679,7 +1620,6 @@
                     setTimeout(() => loadHistory31Days(), 1500);
                     finishCallback(true, res.message);
                 } else {
-                    // Jika gagal atau peringatan jam pulang, langsung tutup loading & hilangkan blur
                     isAbsenCompleted = true;
                     document.getElementById('absensi-loading-modal').classList.add('hidden');
                     document.getElementById('app-wrapper-container').classList.remove('is-blurred');
@@ -1774,6 +1714,40 @@
                 container.innerHTML = html;
             } else {
                 container.innerHTML = `<p style="color: #ef4444; font-size:11px; text-align:center; grid-column: span 2;">Gagal memuat data token.</p>`;
+            }
+        }
+
+        // --- FUNGSI LOAD DATA AUDIT KAMAR DARI LAPORAN_TAMU (SHIFT 1: 10:00 - 22:00, 1 Jam = 0.79 kWh) ---
+        async function loadAuditKamarData(dateStr) {
+            const container = document.getElementById('audit-kamar-list-container');
+            const label = document.getElementById('audit-kamar-date-label');
+            container.innerHTML = `<p style="color: #64748b; font-size:11px; text-align:center;">Memuat data audit kamar...</p>`;
+
+            const res = await callGAS('getAuditKamarData', { targetDateStr: dateStr });
+            if (res && res.success) {
+                label.innerText = `Menampilkan data tanggal: ${res.displayDate}`;
+                const kamarList = ['Kamar 14B', 'Kamar 15', 'Kamar 16', 'Kamar 19'];
+                
+                let html = '';
+                kamarList.forEach(kamarName => {
+                    let dataKamar = res.audit[kamarName] || { count: 0, totalJam: 0, estKwh: 0 };
+                    
+                    html += `
+                        <div style="background: #111c3a; border: 1px solid #334155; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 2px;">${kamarName}</div>
+                                <div style="font-size: 10px; color: #38bdf8;">${dataKamar.count} Transaksi (${dataKamar.totalJam} Jam Shift 1)</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; font-weight: 700; color: #34d399;">Est: ~${dataKamar.estKwh.toFixed(2)} kWh</div>
+                                <div style="font-size: 9px; color: #94a3b8;">Rate: 0.79 kWh/jam</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<p style="color: #ef4444; font-size:11px; text-align:center;">Gagal memuat rekap audit kamar.</p>`;
             }
         }
 
