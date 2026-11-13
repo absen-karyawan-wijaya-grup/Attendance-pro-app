@@ -230,7 +230,6 @@
             100% { top: 0%; opacity: 0.3; }
         }
 
-        /* Styling Titik-titik Laser / Facial Landmark Overlay yang Disesuaikan agar Presisi */
         .face-laser-overlay {
             position: absolute;
             top: 0;
@@ -555,13 +554,13 @@
         .stat-info .title { font-size: 10px; color: #64748b; }
         .stat-info .value { font-size: 14px; font-weight: 700; color: #fff; }
 
-        /* Styling Kartu Notifikasi Geser (Swipeable Notification Item) */
+        /* Styling Kartu Notifikasi Geser Samping (Swipeable Notification Item ala HP) */
         .notif-wrapper {
             position: relative;
             margin-bottom: 8px;
             border-radius: 8px;
             overflow: hidden;
-            background: #ef4444; /* Background merah dengan ikon tong sampah di bawahnya */
+            background: #ef4444; /* Background merah saat digeser */
         }
         .notif-delete-bg {
             position: absolute;
@@ -585,7 +584,7 @@
             touch-action: pan-y; 
             user-select: none; 
             z-index: 2;
-            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
+            transition: transform 0.15s ease-out, opacity 0.15s ease-out;
         }
         
         .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
@@ -706,15 +705,12 @@
                 <div class="face-scan-wrapper">
                     <div class="circular-camera-container">
                         <div class="circular-camera-inner">
-                            <!-- Video Webcam (Aktif setelah 4 token lengkap) -->
                             <video id="webcam" class="hidden" autoplay playsinline muted></video>
                             
-                            <!-- Placeholder Logo Andara Wijaya Penuh Menutupi Border Lingkaran -->
                             <div id="webcam-placeholder-siluet" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000000; position: relative; overflow: hidden;">
                                 <img src="https://lh3.googleusercontent.com/d/11qKAyg3RO1qm-JT7ZpZq_d6x6QzDxXzv" alt="Logo Andara Wijaya" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
 
-                            <!-- Overlay Panduan Wajah & Titik Laser Presisi -->
                             <div id="face-laser-guide" class="face-laser-overlay hidden">
                                 <div class="laser-grid">
                                     <div class="laser-dot" style="top: 25%; left: 35%;"></div>
@@ -1013,7 +1009,6 @@
 
                     <!-- ==================== CARD FULL: AUDIT SELISIH TOKEN KAMAR ==================== -->
                     <div class="bg-slate-950/95 border border-slate-800 rounded-2xl p-4 mb-5 space-y-3.5 shadow-xl w-full">
-                        <!-- Header Card -->
                         <div class="flex justify-between items-start border-b border-slate-800/80 pb-3">
                             <div>
                                 <h3 class="font-bold text-sm tracking-wide text-slate-100 uppercase">AUDIT SELISIH TOKEN KAMAR</h3>
@@ -1022,13 +1017,11 @@
                             <input type="date" id="picker-audit-kamar" class="px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-900 text-white text-[10px]" onchange="loadAuditKamarData(this.value)">
                         </div>
 
-                        <!-- Info Reset & Tanggal -->
                         <div class="flex justify-between items-center text-[10px] bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-800/60">
                             <span id="audit-kamar-date-label" class="text-emerald-400 font-semibold">Hari ini</span>
                             <span id="audit-shift-badge" class="text-sky-400 font-semibold">Reset otomatis 00:00</span>
                         </div>
 
-                        <!-- Tabel Daftar Kamar (Full Lebar & Lega) -->
                         <div class="space-y-2">
                             <div class="grid grid-cols-12 text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-2">
                                 <span class="col-span-4">KAMAR</span>
@@ -1040,20 +1033,17 @@
                             </div>
                         </div>
 
-                        <!-- Panel Audit Token Meteran Aktif -->
                         <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl space-y-3">
                             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                 <h4 id="title-audit-kamar" class="font-bold text-xs text-sky-400">⚡ Audit Token (Kamar 14B)</h4>
                                 <span id="badge-status-audit" class="bg-emerald-600 text-white text-[9.5px] px-2.5 py-0.5 rounded-md font-semibold">✓ Sesuai Laporan</span>
                             </div>
 
-                            <!-- Target kWh -->
                             <div class="flex justify-between items-center text-[11px] bg-slate-950/60 px-3 py-2 rounded-lg border border-slate-800/60">
                                 <span class="text-slate-400" id="label-target-shift">Target kWh Sesuai Jam Orderan:</span>
                                 <strong id="target-kwh-audit" class="text-amber-300 font-bold text-xs">0.00 kWh</strong>
                             </div>
 
-                            <!-- Input Angka Token -->
                             <div class="grid grid-cols-3 gap-2">
                                 <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
                                     <label class="text-[9.5px] font-medium text-slate-400 block mb-1 text-center">Token Pagi</label>
@@ -1069,7 +1059,6 @@
                                 </div>
                             </div>
 
-                            <!-- Rincian Hasil Perhitungan -->
                             <div class="bg-slate-950/90 p-3 rounded-lg border border-slate-800 text-[11px] space-y-1.5">
                                 <div class="text-slate-500 text-[9.5px] border-b border-slate-900 pb-1">
                                     Rumus: (Pagi + Isi Ulang) - Malam
@@ -1085,7 +1074,6 @@
                             </div>
                         </div>
 
-                        <!-- Tombol Salin Rekap WA -->
                         <button type="button" onclick="salinRekapAuditWA()" class="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl transition-all text-xs flex items-center justify-center gap-2 shadow-md">
                             <i class="fa-brands fa-whatsapp text-sm"></i> SALIN FORMAT REKAP GRUP WA
                         </button>
@@ -1236,13 +1224,11 @@
                 <button onclick="closeTokenCameraDirect()" class="text-gray-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Area Tampilan Video Kamera Token -->
             <div class="relative w-full aspect-[3/4] bg-black overflow-hidden flex items-center justify-center">
                 <video id="token-video-element" autoplay playsinline muted class="w-full h-full object-cover"></video>
                 <canvas id="token-snapshot-canvas" class="hidden"></canvas>
             </div>
             
-            <!-- Tombol Jepret Token -->
             <div class="p-4 bg-slate-800 flex justify-center border-t border-slate-700">
                 <button onclick="captureTokenLivePhoto()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-full shadow-lg flex items-center gap-2 transition active:scale-95 text-xs">
                     <i class="fa-solid fa-camera text-base"></i> Jepret Foto Token
@@ -1322,7 +1308,6 @@
             '19': null
         };
 
-        // State Audit Selisih Token Kamar
         let auditKamarState = {
             "Kamar 14B": { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
             "Kamar 15":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
@@ -1490,7 +1475,6 @@
                 video.srcObject = tokenVideoStream;
                 await video.play().catch(e => console.log("Autoplay token terhalang:", e));
             } catch (err) {
-                console.warn("Exact environment ditolak, mencoba mode ideal...", err);
                 try {
                     const fallbackConstraints = {
                         video: {
@@ -1647,13 +1631,10 @@
                     </div>
                     <div class="notif-card-item" id="notif-item-${index}" 
                          style="border-left: 4px solid ${n.status.toLowerCase().includes('terlambat') || n.status.toLowerCase().includes('alfa') ? '#ef4444' : '#10b981'};"
-                         onmousedown="startSwipe(event, ${index})" 
-                         onttouchstart="startSwipe(event, ${index})"
-                         onmousemove="onSwipe(event, ${index})" 
-                         ontouchmove="onSwipe(event, ${index})"
-                         onmouseup="endSwipe(event, ${index})" 
-                         ontouchend="endSwipe(event, ${index})"
-                         onmouseleave="endSwipe(event, ${index})">
+                         onpointerdown="startSwipe(event, ${index})" 
+                         onpointermove="onSwipe(event, ${index})"
+                         onpointerup="endSwipe(event, ${index})"
+                         onpointercancel="endSwipe(event, ${index})">
                         <div style="font-weight: bold; color: #fff; display: flex; justify-content: space-between;">
                             <span>${n.title}</span><span style="font-size: 10px; color: #94a3b8;">${n.date}</span>
                         </div>
@@ -1666,32 +1647,31 @@
             `).join('');
         }
 
-        // Variabel untuk interaksi Swipe Hapus Notifikasi
+        // Variabel untuk Swipe Samping Kiri & Kanan (Pointer Events untuk HP & PC)
         let activeSwipeIndex = null;
         let startX = 0;
         let currentX = 0;
         let isSwiping = false;
 
-        function getClientX(e) {
-            return e.touches ? e.touches[0].clientX : e.clientX;
-        }
-
         function startSwipe(e, index) {
             activeSwipeIndex = index;
-            startX = getClientX(e);
+            startX = e.clientX;
             currentX = 0;
             isSwiping = true;
+            const item = document.getElementById(`notif-item-${index}`);
+            if (item) {
+                item.setPointerCapture(e.pointerId);
+            }
         }
 
         function onSwipe(e, index) {
             if (!isSwiping || activeSwipeIndex !== index) return;
-            const x = getClientX(e);
-            currentX = x - startX;
+            currentX = e.clientX - startX;
             const item = document.getElementById(`notif-item-${index}`);
             if (item) {
                 item.style.transition = 'none';
                 item.style.transform = `translateX(${currentX}px)`;
-                item.style.opacity = `${1 - Math.abs(currentX) / 250}`;
+                item.style.opacity = `${Math.max(0.2, 1 - Math.abs(currentX) / 220)}`;
             }
         }
 
@@ -1702,8 +1682,8 @@
             if (!item) return;
 
             item.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-            if (Math.abs(currentX) > 100) {
-                // Geser cukup jauh -> Hapus notifikasi
+            if (Math.abs(currentX) > 80) {
+                // Geser ke kiri atau kanan melewati batas 80px -> hapus notifikasi
                 item.style.transform = `translateX(${currentX > 0 ? 400 : -400}px)`;
                 item.style.opacity = '0';
                 setTimeout(() => {
@@ -1713,7 +1693,7 @@
                     renderNotificationList();
                 }, 200);
             } else {
-                // Kembalikan ke posisi semula
+                // Kembalikan ke posisi awal jika geseran kurang dari batas
                 item.style.transform = 'translateX(0px)';
                 item.style.opacity = '1';
             }
