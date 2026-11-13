@@ -631,10 +631,19 @@
                     <div class="clock-date" id="live-date">Hari, 00 Bulan 2026</div>
                 </div>
 
+                <!-- FACE SCAN CONTAINER DENGAN IKON SILUET ORANG SEBELUM FOTO TOKEN LENGKAP -->
                 <div class="face-scan-wrapper">
                     <div class="circular-camera-container">
                         <div class="circular-camera-inner">
-                            <video id="webcam" autoplay playsinline muted></video>
+                            <!-- Video Webcam (Disembunyikan sebelum 4 token lengkap) -->
+                            <video id="webcam" class="hidden" autoplay playsinline muted></video>
+                            
+                            <!-- Placeholder Siluet / Ikon Orang Setengah Badan -->
+                            <div id="webcam-placeholder-siluet" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #090f22; color: #64748b;">
+                                <i class="fa-solid fa-user-gear" style="font-size: 48px; color: #38bdf8; margin-bottom: 6px; opacity: 0.8;"></i>
+                                <span style="font-size: 9px; color: #94a3b8; text-align: center; padding: 0 10px; font-weight: 500;">Selesaikan foto 4 token dulu</span>
+                            </div>
+
                             <div id="camera-fallback" class="camera-fallback-overlay hidden">
                                 <i class="fa-solid fa-camera" style="font-size: 24px; color: #38bdf8; margin-bottom: 6px;"></i>
                                 <p style="font-size: 10px; color: #cbd5e1; margin-bottom: 8px;">Ketuk untuk aktifkan kamera</p>
@@ -646,7 +655,7 @@
                     <div id="gps-status-badge" class="gps-status-badge">
                         <i class="fa-solid fa-circle-notch fa-spin"></i> GPS LOCATING...
                     </div>
-                    <div class="scan-instruction">Scanning... Real-time camera required</div>
+                    <div id="scan-instruction-label" class="scan-instruction">Lengkapi 4 foto token listrik terlebih dahulu</div>
                 </div>
 
                 <div class="location-info-card">
@@ -1259,7 +1268,12 @@
             updateNotificationBadge();
             checkAutoResetAuditHarian();
             const savedUser = localStorage.getItem('app_user_session');
-            if (savedUser) { showMainApp(savedUser); } else { initCamera(); }
+            if (savedUser) { 
+                showMainApp(savedUser); 
+            } else {
+                // Di awal sebelum login, biarkan siluet/ikon tampil (jangan jalankan kamera depan dulu)
+                updateWebcamStateByTokens();
+            }
         });
 
         function checkAutoResetAuditHarian() {
@@ -1334,7 +1348,38 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // BUKA KAMERA TOKEN (Matikan dulu kamera absen depan agar tidak konflik)
+        // CEK APAKAH SEMUA TOKEN SUDAH LENGKAP (14B, 15, 16, 19)
+        function areAllTokensComplete() {
+            return (tokenPhotos['14B'] && tokenPhotos['15'] && tokenPhotos['16'] && tokenPhotos['19']);
+        }
+
+        // KONTROL AKTIF/MATI WEBCAM BERDASARKAN KELENGKAPAN TOKEN
+        function updateWebcamStateByTokens() {
+            const webcamEl = document.getElementById('webcam');
+            const siluetEl = document.getElementById('webcam-placeholder-siluet');
+            const instructionEl = document.getElementById('scan-instruction-label');
+
+            if (areAllTokensComplete()) {
+                // Jika 4 foto token sudah selesai, aktifkan kamera depan absen wajah!
+                if (siluetEl) siluetEl.classList.add('hidden');
+                if (webcamEl) webcamEl.classList.remove('hidden');
+                if (instructionEl) instructionEl.innerText = "Scanning... Silahkan lakukan presensi wajah";
+                if (!videoStream) {
+                    initCamera();
+                }
+            } else {
+                // Jika belum lengkap, matikan kamera depan dan tampilkan siluet
+                if (webcamEl) webcamEl.classList.add('hidden');
+                if (siluetEl) siluetEl.classList.remove('hidden');
+                if (instructionEl) instructionEl.innerText = "Lengkapi 4 foto token listrik terlebih dahulu";
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = null;
+                }
+            }
+        }
+
+        // BUKA KAMERA TOKEN (Kamera absen depan sudah dalam keadaan mati / tidak konflik)
         async function openTokenCameraDirect(kamar) {
             activeTokenTarget = kamar;
             const modal = document.getElementById('token-camera-modal');
@@ -1343,13 +1388,6 @@
             document.getElementById('token-camera-title').innerText = `Kamera Token - Kamar ${kamar}`;
             modal.classList.remove('hidden');
 
-            // 1. Matikan kamera absen depan sementara agar hardware kamera HP tidak konflik
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
-
-            // 2. Bersihkan stream token sebelumnya jika ada
             if (tokenVideoStream) {
                 tokenVideoStream.getTracks().forEach(track => track.stop());
             }
@@ -1409,7 +1447,7 @@
             }
         }
 
-        // MENUTUP KAMERA TOKEN (Hidupkan kembali kamera depan absen)
+        // MENUTUP KAMERA TOKEN
         function closeTokenCameraDirect() {
             if (tokenVideoStream) {
                 tokenVideoStream.getTracks().forEach(track => track.stop());
@@ -1419,8 +1457,8 @@
             if (video) video.srcObject = null;
             document.getElementById('token-camera-modal').classList.add('hidden');
 
-            // Hidupkan kembali kamera depan absensi wajah
-            initCamera();
+            // Cek apakah 4 token sudah lengkap. Jika sudah lengkap, aktifkan kamera depan absen.
+            updateWebcamStateByTokens();
         }
 
         // MENJEPRET FOTO TOKEN
@@ -1476,7 +1514,6 @@
                 }
             }
 
-            // Tutup modal kamera token dan otomatis aktifkan kembali kamera depan absen
             closeTokenCameraDirect();
         }
 
@@ -1542,6 +1579,9 @@
         }
 
         async function initCamera() {
+            // Hanya aktifkan jika semua token sudah lengkap
+            if (!areAllTokensComplete()) return;
+
             const video = document.getElementById('webcam');
             const fallbackOverlay = document.getElementById('camera-fallback');
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
@@ -1556,6 +1596,10 @@
         }
 
         function requestCameraExplicitly() {
+            if (!areAllTokensComplete()) {
+                alert("Selesaikan dulu foto 4 token listrik sebelum mengaktifkan kamera absen.");
+                return;
+            }
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
             .then(stream => {
                 if (videoStream) videoStream.getTracks().forEach(track => track.stop());
@@ -1603,7 +1647,9 @@
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('topbar-user-name').innerText = userName;
-            switchTab('absen'); initCamera(); initLocation();
+            switchTab('absen'); 
+            updateWebcamStateByTokens(); 
+            initLocation();
         }
 
         function handleHRLogin() {
@@ -1632,17 +1678,20 @@
             if (tabName === 'absen') {
                 document.getElementById('tab-absen').classList.remove('hidden');
                 document.querySelectorAll('.nav-item')[0].classList.add('active');
-                if (!videoStream) initCamera();
+                updateWebcamStateByTokens();
             } else if (tabName === 'hr') {
                 document.getElementById('tab-hr').classList.remove('hidden');
                 document.querySelectorAll('.nav-item')[1].classList.add('active');
+                if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
             } else if (tabName === 'hari-kerja') {
                 document.getElementById('tab-hari-kerja').classList.remove('hidden');
                 document.querySelectorAll('.nav-item')[2].classList.add('active');
                 loadHariKerjaStats();
+                if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
             } else if (tabName === 'izin') {
                 document.getElementById('tab-izin').classList.remove('hidden');
                 document.querySelectorAll('.nav-item')[3].classList.add('active');
+                if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
             }
         }
 
@@ -1764,7 +1813,7 @@
             if (!currentLat || !currentLng) { showStatus('absen-status', 'Gagal: GPS belum terdeteksi!', 'error'); return; }
             if (currentDistance > MAX_ALLOWED_RADIUS) { showStatus('absen-status', `Gagal: Posisi Anda ${currentDistance.toFixed(1)} m dari lokasi!`, 'error'); return; }
 
-            if (!tokenPhotos['14B'] || !tokenPhotos['15'] || !tokenPhotos['16'] || !tokenPhotos['19']) {
+            if (!areAllTokensComplete()) {
                 showStatus('absen-status', 'Gagal: Wajib foto token listrik kamar 14B, 15, 16, dan 19 terlebih dahulu!', 'error');
                 showCustomModal("Foto Token Belum Lengkap", "Anda wajib mengambil foto meteran token listrik untuk semua kamar (14B, 15, 16, 19) secara real-time sebelum melakukan presensi.", 'fa-triangle-exclamation', '#f59e0b');
                 return;
