@@ -1334,7 +1334,7 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // BUKA KAMERA TOKEN LANGSUNG KE KAMERA BELAKANG UTAMA (DIJAMIN TIDAK TERTUKAR KE DEPAN)
+        // BUKA KAMERA TOKEN (Matikan dulu kamera absen depan agar tidak konflik)
         async function openTokenCameraDirect(kamar) {
             activeTokenTarget = kamar;
             const modal = document.getElementById('token-camera-modal');
@@ -1343,12 +1343,18 @@
             document.getElementById('token-camera-title').innerText = `Kamera Token - Kamar ${kamar}`;
             modal.classList.remove('hidden');
 
+            // 1. Matikan kamera absen depan sementara agar hardware kamera HP tidak konflik
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+
+            // 2. Bersihkan stream token sebelumnya jika ada
             if (tokenVideoStream) {
                 tokenVideoStream.getTracks().forEach(track => track.stop());
             }
 
             try {
-                // Memaksa kamera belakang menggunakan exact environment
                 const constraints = {
                     video: {
                         facingMode: { exact: "environment" },
@@ -1362,37 +1368,48 @@
                 video.srcObject = tokenVideoStream;
                 await video.play().catch(e => console.log("Autoplay token terhalang:", e));
             } catch (err) {
-                console.warn("Exact environment ditolak, mencoba mendeteksi ID kamera belakang...", err);
+                console.warn("Exact environment ditolak, mencoba mode ideal...", err);
                 try {
-                    const devices = await navigator.mediaDevices.enumerateDevices();
-                    const videoDevices = devices.filter(d => d.kind === 'videoinput');
-                    
-                    let backCameraId = null;
-                    for (let dev of videoDevices) {
-                        const name = dev.label.toLowerCase();
-                        if (name.includes('back') || name.includes('rear') || name.includes('belakang') || name.includes('environment')) {
-                            backCameraId = dev.deviceId;
-                            break;
-                        }
-                    }
-
-                    const targetId = backCameraId || (videoDevices.length > 1 ? videoDevices[videoDevices.length - 1].deviceId : null);
-                    const finalConstraints = {
-                        video: targetId ? { deviceId: { exact: targetId } } : { facingMode: "environment" },
+                    const fallbackConstraints = {
+                        video: {
+                            facingMode: "environment",
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
                         audio: false
                     };
-
-                    tokenVideoStream = await navigator.mediaDevices.getUserMedia(finalConstraints);
+                    tokenVideoStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
                     video.srcObject = tokenVideoStream;
                     await video.play();
                 } catch (e2) {
-                    alert("Gagal membuka kamera belakang. Pastikan izin kamera sudah diberikan di pengaturan HP Anda.");
-                    closeTokenCameraDirect();
+                    try {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                        let backCameraId = null;
+                        for (let dev of videoDevices) {
+                            const name = dev.label.toLowerCase();
+                            if (name.includes('back') || name.includes('rear') || name.includes('belakang') || name.includes('environment')) {
+                                backCameraId = dev.deviceId;
+                                break;
+                            }
+                        }
+                        const targetId = backCameraId || (videoDevices.length > 1 ? videoDevices[videoDevices.length - 1].deviceId : null);
+                        
+                        tokenVideoStream = await navigator.mediaDevices.getUserMedia({
+                            video: targetId ? { deviceId: { exact: targetId } } : true,
+                            audio: false
+                        });
+                        video.srcObject = tokenVideoStream;
+                        await video.play();
+                    } catch (e3) {
+                        alert("Gagal membuka kamera belakang. Pastikan izin kamera diizinkan.");
+                        closeTokenCameraDirect();
+                    }
                 }
             }
         }
 
-        // MENUTUP KAMERA TOKEN
+        // MENUTUP KAMERA TOKEN (Hidupkan kembali kamera depan absen)
         function closeTokenCameraDirect() {
             if (tokenVideoStream) {
                 tokenVideoStream.getTracks().forEach(track => track.stop());
@@ -1401,9 +1418,12 @@
             const video = document.getElementById('token-video-element');
             if (video) video.srcObject = null;
             document.getElementById('token-camera-modal').classList.add('hidden');
+
+            // Hidupkan kembali kamera depan absensi wajah
+            initCamera();
         }
 
-        // MENJEPRET FOTO TOKEN LIVE STREAMING
+        // MENJEPRET FOTO TOKEN
         function captureTokenLivePhoto() {
             const video = document.getElementById('token-video-element');
             const canvas = document.getElementById('token-snapshot-canvas');
@@ -1456,6 +1476,7 @@
                 }
             }
 
+            // Tutup modal kamera token dan otomatis aktifkan kembali kamera depan absen
             closeTokenCameraDirect();
         }
 
