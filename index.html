@@ -1334,7 +1334,7 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // BUKA KAMERA TOKEN LIVE STREAMING LANGSUNG KE KAMERA BELAKANG
+        // BUKA KAMERA TOKEN LIVE STREAMING LANGSUNG KE KAMERA BELAKANG (DENGAN AMAN)
         async function openTokenCameraDirect(kamar) {
             activeTokenTarget = kamar;
             const modal = document.getElementById('token-camera-modal');
@@ -1348,10 +1348,10 @@
             }
 
             try {
-                // Memaksa penggunaan kamera belakang (environment) secara mutlak
+                // Menggunakan facingMode environment secara fleksibel agar kompatibel di semua HP
                 const constraints = {
                     video: {
-                        facingMode: { exact: "environment" },
+                        facingMode: "environment",
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     },
@@ -1362,21 +1362,13 @@
                 video.srcObject = tokenVideoStream;
                 await video.play().catch(e => console.log("Autoplay token terhalang:", e));
             } catch (err) {
-                console.warn("Kamera belakang exact gagal, mencoba environment standar...", err);
+                console.warn("Gagal membuka kamera belakang utama, mencoba kamera universal...", err);
                 try {
-                    const fallbackConstraints = {
-                        video: {
-                            facingMode: "environment",
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        },
-                        audio: false
-                    };
-                    tokenVideoStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+                    tokenVideoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                     video.srcObject = tokenVideoStream;
                     await video.play();
                 } catch (e) {
-                    alert("Gagal membuka kamera belakang. Pastikan izin kamera sudah diberikan di pengaturan HP Anda.");
+                    alert("Gagal membuka kamera. Pastikan izin kamera sudah diberikan di pengaturan HP Anda.");
                     closeTokenCameraDirect();
                 }
             }
