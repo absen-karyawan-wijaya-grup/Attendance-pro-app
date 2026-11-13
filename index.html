@@ -662,7 +662,7 @@
                     </button>
                 </div>
 
-                <!-- WAJIB FOTO TOKEN LISTRIK (LANGSUNG KAMERA UTAMA TANPA PILIHAN FILE) -->
+                <!-- WAJIB FOTO TOKEN LISTRIK -->
                 <div class="token-section-box">
                     <h4 style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;"><i class="fa-solid fa-bolt text-yellow-400"></i> Wajib Foto Token Listrik</h4>
                     <p style="font-size: 10px; color: #38bdf8; margin-bottom: 2px; font-weight: 600;">⚡ Wajib foto token pagi sebelum absen masuk</p>
@@ -671,56 +671,55 @@
                     <div class="token-grid">
                         <div class="token-item">
                             <h4>Token Kamar 14B</h4>
-                            <div id="box-preview-14b" class="token-preview-box" onclick="triggerNativeCamera('14B')">
+                            <div id="box-preview-14b" class="token-preview-box" onclick="openTokenCamera('14B')">
                                 <div id="placeholder-14b" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-14b" class="hidden" src="" alt="Token 14B" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="triggerNativeCamera('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 15</h4>
-                            <div id="box-preview-15" class="token-preview-box" onclick="triggerNativeCamera('15')">
+                            <div id="box-preview-15" class="token-preview-box" onclick="openTokenCamera('15')">
                                 <div id="placeholder-15" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-15" class="hidden" src="" alt="Token 15" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="triggerNativeCamera('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 16</h4>
-                            <div id="box-preview-16" class="token-preview-box" onclick="triggerNativeCamera('16')">
+                            <div id="box-preview-16" class="token-preview-box" onclick="openTokenCamera('16')">
                                 <div id="placeholder-16" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-16" class="hidden" src="" alt="Token 16" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="triggerNativeCamera('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 19</h4>
-                            <div id="box-preview-19" class="token-preview-box" onclick="triggerNativeCamera('19')">
+                            <div id="box-preview-19" class="token-preview-box" onclick="openTokenCamera('19')">
                                 <div id="placeholder-19" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-19" class="hidden" src="" alt="Token 19" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="triggerNativeCamera('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
                         </div>
                     </div>
                 </div>
 
+                <input type="file" id="hidden-token-input" accept="image/*" capture="environment" class="hidden" onchange="handleTokenFileSelected(event)">
+
                 <div id="absen-status" class="status-msg hidden"></div>
             </div>
-
-            <!-- HIDDEN NATIVE CAMERA INPUT (MENGHINDARKAN PILIHAN FILE/GALERI) -->
-            <input type="file" id="native-camera-input" accept="image/*" capture="environment" style="display: none;" onchange="handleNativeCameraCapture(event)">
 
             <!-- TAB 2: HR MENU -->
             <div id="tab-hr" class="tab-content card hidden" style="padding: 12px; border-radius: 16px;">
@@ -1127,10 +1126,10 @@
 
             <!-- BOTTOM NAVIGATION -->
             <div class="bottom-nav">
-                <div class="nav-item active" onclick="switchTab('absen')"><i class="fa-solid fa-house"><span>Home</span></i></div>
-                <div class="nav-item" onclick="switchTab('hr')"><i class="fa-solid fa-shield-halved"><span>HR Menu</span></i></div>
-                <div class="nav-item" onclick="switchTab('hari-kerja')"><i class="fa-solid fa-calendar-days"><span>History</span></i></div>
-                <div class="nav-item" onclick="switchTab('izin')"><i class="fa-solid fa-file-signature"><span>Izin</span></i></div>
+                <div class="nav-item active" onclick="switchTab('absen')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+                <div class="nav-item" onclick="switchTab('hr')"><i class="fa-solid fa-shield-halved"></i><span>HR Menu</span></div>
+                <div class="nav-item" onclick="switchTab('hari-kerja')"><i class="fa-solid fa-calendar-days"></i><span>History</span></div>
+                <div class="nav-item" onclick="switchTab('izin')"><i class="fa-solid fa-file-signature"></i><span>Izin</span></div>
             </div>
 
         </div>
@@ -1311,73 +1310,10 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // Memicu kamera utama sistem Android secara langsung tanpa opsi file/galeri
-        function triggerNativeCamera(kamar) {
+        // Langsung buka kamera untuk token kamar tanpa melalui pilihan pop-up
+        function openTokenCamera(kamar) {
             activeKamarTarget = kamar;
-            const fileInput = document.getElementById('native-camera-input');
-            fileInput.value = ""; // Reset agar bisa diklik berkali-kali
-            fileInput.click();
-        }
-
-        // Menangkap hasil jepretan kamera utama dan menambahkan watermark waktu/lokasi
-        function handleNativeCameraCapture(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxWidth = 960;
-                    const scale = maxWidth / img.width;
-                    canvas.width = maxWidth;
-                    canvas.height = img.height * scale;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
-
-                    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-                    ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
-                    ctx.fillStyle = "#38bdf8";
-                    ctx.fillRect(12, canvas.height - 55, 4, 45);
-                    ctx.fillStyle = "#ffffff";
-                    ctx.font = "bold 12px Inter, Arial, sans-serif";
-                    ctx.fillText(`⚡ TOKEN KAMAR ${activeKamarTarget} ${coordsStr}`, 22, canvas.height - 33);
-                    ctx.fillStyle = "#cbd5e1";
-                    ctx.font = "11px Inter, Arial, sans-serif";
-                    ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
-
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    const kamarNum = activeKamarTarget;
-                    tokenPhotos[kamarNum] = compressedDataUrl;
-
-                    const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
-                    const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
-                    const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
-
-                    if (boxEl && placeholderEl && imgEl) {
-                        boxEl.classList.add('has-photo');
-                        placeholderEl.classList.add('hidden');
-                        imgEl.src = compressedDataUrl;
-                        imgEl.classList.remove('hidden');
-
-                        if (!boxEl.querySelector('.token-badge-success')) {
-                            const badge = document.createElement('div');
-                            badge.className = 'token-badge-success';
-                            badge.innerHTML = '✓ Selesai';
-                            boxEl.appendChild(badge);
-                        }
-                    }
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
+            document.getElementById('hidden-token-input').click();
         }
 
         function openFullscreenImage(imgUrl) {
@@ -1464,6 +1400,67 @@
                 if (video) { video.srcObject = stream; video.play().catch(e => console.warn(e)); }
                 document.getElementById('camera-fallback').classList.add('hidden');
             }).catch(err => alert("Akses kamera ditolak atau diblokir."));
+        }
+
+        function handleTokenFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file || !activeKamarTarget) return;
+
+            const kamarNum = activeKamarTarget;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxWidth = 960;
+                    const scale = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
+
+                    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+                    ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
+                    ctx.fillStyle = "#38bdf8";
+                    ctx.fillRect(12, canvas.height - 55, 4, 45);
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 12px Inter, Arial, sans-serif";
+                    ctx.fillText(`⚡ TOKEN KAMAR ${kamarNum} ${coordsStr}`, 22, canvas.height - 33);
+                    ctx.fillStyle = "#cbd5e1";
+                    ctx.font = "11px Inter, Arial, sans-serif";
+                    ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
+
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    tokenPhotos[kamarNum] = compressedDataUrl;
+
+                    const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
+                    const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
+                    const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
+
+                    if (boxEl && placeholderEl && imgEl) {
+                        boxEl.classList.add('has-photo');
+                        placeholderEl.classList.add('hidden');
+                        imgEl.src = compressedDataUrl;
+                        imgEl.classList.remove('hidden');
+
+                        if (!boxEl.querySelector('.token-badge-success')) {
+                            const badge = document.createElement('div');
+                            badge.className = 'token-badge-success';
+                            badge.innerHTML = '✓ Selesai';
+                            boxEl.appendChild(badge);
+                        }
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
         }
 
         function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
