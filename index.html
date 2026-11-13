@@ -554,13 +554,12 @@
         .stat-info .title { font-size: 10px; color: #64748b; }
         .stat-info .value { font-size: 14px; font-weight: 700; color: #fff; }
 
-        /* Styling Kartu Notifikasi Geser Samping (Swipeable Notification Item ala HP) */
         .notif-wrapper {
             position: relative;
             margin-bottom: 8px;
             border-radius: 8px;
             overflow: hidden;
-            background: #ef4444; /* Background merah saat digeser */
+            background: #ef4444;
         }
         .notif-delete-bg {
             position: absolute;
@@ -679,12 +678,11 @@
                     </div>
                 </div>
 
-                <!-- MODAL NOTIFIKASI -->
+                <!-- MODAL NOTIFIKASI (Tanpa Icon Tong Sampah di Header) -->
                 <div id="notif-modal" class="card hidden" style="position: absolute; top: 60px; left: 0; right: 0; z-index: 1000; max-height: 420px; overflow-y: auto; background: #1e293b; border: 1px solid #334155;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px;">
                         <h3 style="font-size: 13px; color: #fff;"><i class="fa-solid fa-bell" style="color: #38bdf8;"></i> Riwayat Notifikasi</h3>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <i class="fa-solid fa-trash-can" style="cursor: pointer; font-size: 14px; color: #ef4444;" onclick="clearAllNotifications()" title="Hapus Semua"></i>
                             <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 16px; color: #94a3b8;" onclick="closeNotifications()"></i>
                         </div>
                     </div>
@@ -1420,6 +1418,25 @@
             return (tokenPhotos['14B'] && tokenPhotos['15'] && tokenPhotos['16'] && tokenPhotos['19']);
         }
 
+        function resetTokenUIAndPhotos() {
+            tokenPhotos = { '14B': null, '15': null, '16': null, '19': null };
+            ['14b', '15', '16', '19'].forEach(kamar => {
+                const boxEl = document.getElementById(`box-preview-${kamar}`);
+                const placeholderEl = document.getElementById(`placeholder-${kamar}`);
+                const imgEl = document.getElementById(`preview-img-${kamar}`);
+                
+                if (boxEl && placeholderEl && imgEl) {
+                    boxEl.classList.remove('has-photo');
+                    placeholderEl.classList.remove('hidden');
+                    imgEl.src = '';
+                    imgEl.classList.add('hidden');
+                    const badge = boxEl.querySelector('.token-badge-success');
+                    if (badge) badge.remove();
+                }
+            });
+            updateWebcamStateByTokens();
+        }
+
         function updateWebcamStateByTokens() {
             const webcamEl = document.getElementById('webcam');
             const siluetEl = document.getElementById('webcam-placeholder-siluet');
@@ -1647,7 +1664,6 @@
             `).join('');
         }
 
-        // Variabel untuk Swipe Samping Kiri & Kanan (Pointer Events untuk HP & PC)
         let activeSwipeIndex = null;
         let startX = 0;
         let currentX = 0;
@@ -1683,7 +1699,6 @@
 
             item.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
             if (Math.abs(currentX) > 80) {
-                // Geser ke kiri atau kanan melewati batas 80px -> hapus notifikasi
                 item.style.transform = `translateX(${currentX > 0 ? 400 : -400}px)`;
                 item.style.opacity = '0';
                 setTimeout(() => {
@@ -1693,18 +1708,10 @@
                     renderNotificationList();
                 }, 200);
             } else {
-                // Kembalikan ke posisi awal jika geseran kurang dari batas
                 item.style.transform = 'translateX(0px)';
                 item.style.opacity = '1';
             }
             activeSwipeIndex = null;
-        }
-
-        function clearAllNotifications() {
-            appNotifications = [];
-            localStorage.setItem('app_notifications', JSON.stringify(appNotifications));
-            updateNotificationBadge();
-            renderNotificationList();
         }
 
         function closeNotifications() { document.getElementById('notif-modal').classList.add('hidden'); }
@@ -1975,6 +1982,10 @@
                     allowForcePulang = false;
                     showStatus('absen-status', res.message, 'success');
                     addNotification(`Absen ${tipe} Berhasil`, `Pencatatan absen ${tipe.toLowerCase()} & token sukses (${res.message}).`, new Date().toLocaleTimeString('id-ID', {hour12: false}), res.message.includes('Terlambat') ? 'Terlambat' : 'Berhasil');
+                    
+                    // OTOMATIS BERSIHKAN / RESET FOTO TOKEN SETELAH BERHASIL ABSEN
+                    resetTokenUIAndPhotos();
+
                     setTimeout(() => loadHistory31Days(), 1500);
                     finishCallback(true, res.message);
                 } else {
