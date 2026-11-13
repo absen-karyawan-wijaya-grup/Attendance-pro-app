@@ -53,7 +53,7 @@
             min-height: 100vh;
             background: #0f172a;
             position: relative;
-            padding: 20px 16px 90px 16px; /* Dibuat lebih lega / full */
+            padding: 20px 16px 90px 16px;
             display: flex;
             flex-direction: column;
             transition: filter 0.3s ease;
@@ -491,17 +491,6 @@
             to { opacity: 1; }
         }
 
-        .action-sheet-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 20000; padding: 0;
-        }
-        .action-sheet-card {
-            background: #111c3a; border-top: 1px solid #334155; border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; text-align: center; animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
         .image-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 15px;
         }
@@ -682,47 +671,47 @@
                     <div class="token-grid">
                         <div class="token-item">
                             <h4>Token Kamar 14B</h4>
-                            <div id="box-preview-14b" class="token-preview-box" onclick="openTokenActionSheet('14B')">
+                            <div id="box-preview-14b" class="token-preview-box" onclick="openTokenCamera('14B')">
                                 <div id="placeholder-14b" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-14b" class="hidden" src="" alt="Token 14B" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenActionSheet('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 15</h4>
-                            <div id="box-preview-15" class="token-preview-box" onclick="openTokenActionSheet('15')">
+                            <div id="box-preview-15" class="token-preview-box" onclick="openTokenCamera('15')">
                                 <div id="placeholder-15" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-15" class="hidden" src="" alt="Token 15" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenActionSheet('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 16</h4>
-                            <div id="box-preview-16" class="token-preview-box" onclick="openTokenActionSheet('16')">
+                            <div id="box-preview-16" class="token-preview-box" onclick="openTokenCamera('16')">
                                 <div id="placeholder-16" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-16" class="hidden" src="" alt="Token 16" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenActionSheet('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 19</h4>
-                            <div id="box-preview-19" class="token-preview-box" onclick="openTokenActionSheet('19')">
+                            <div id="box-preview-19" class="token-preview-box" onclick="openTokenCamera('19')">
                                 <div id="placeholder-19" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
                                 <img id="preview-img-19" class="hidden" src="" alt="Token 19" onclick="openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenActionSheet('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
+                            <button class="btn-token-capture" onclick="openTokenCamera('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
                         </div>
                     </div>
                 </div>
@@ -1178,24 +1167,6 @@
         </div>
     </div>
 
-    <!-- ACTION SHEET KAMERA -->
-    <div id="token-action-sheet" class="action-sheet-overlay hidden" onclick="closeTokenActionSheet()">
-        <div class="action-sheet-card" onclick="event.stopPropagation()">
-            <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 14px;" id="sheet-title">Foto Token Kamar</h3>
-            <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 16px;">
-                <button class="btn" style="flex: 1; background: #2563eb; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px;" onclick="triggerDirectCamera()">
-                    <i class="fa-solid fa-camera" style="font-size: 20px;"></i>
-                    <span style="font-size: 11px;">Kamera Bawaan</span>
-                </button>
-                <button class="btn" style="flex: 1; background: #059669; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px;" onclick="openTimemarkApp()">
-                    <i class="fa-solid fa-clock" style="font-size: 20px;"></i>
-                    <span style="font-size: 11px;">Timemark App</span>
-                </button>
-            </div>
-            <button class="btn btn-secondary" onclick="closeTokenActionSheet()" style="padding: 10px;">Batal</button>
-        </div>
-    </div>
-
     <!-- MODAL PREVIEW GAMBAR -->
     <div id="image-fullscreen-modal" class="image-modal-overlay hidden" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
@@ -1339,24 +1310,10 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        function openTokenActionSheet(kamar) {
+        // Langsung buka kamera untuk token kamar tanpa melalui pilihan pop-up
+        function openTokenCamera(kamar) {
             activeKamarTarget = kamar;
-            document.getElementById('sheet-title').innerText = `Foto Token Kamar ${kamar}`;
-            document.getElementById('token-action-sheet').classList.remove('hidden');
-        }
-
-        function closeTokenActionSheet() {
-            document.getElementById('token-action-sheet').classList.add('hidden');
-        }
-
-        function triggerDirectCamera() {
-            closeTokenActionSheet();
             document.getElementById('hidden-token-input').click();
-        }
-
-        function openTimemarkApp() {
-            closeTokenActionSheet();
-            window.location.href = "intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.jeylab.timemark;end;";
         }
 
         function openFullscreenImage(imgUrl) {
@@ -1832,7 +1789,6 @@
             }
         }
 
-        // ==================== FUNGSI AUDIT SELISIH TOKEN KAMAR (SESUAI JENIS ORDERAN / JAM CHECKIN) ====================
         async function loadAuditKamarData(dateStr) {
             currentAuditDateStr = dateStr;
             checkAutoResetAuditHarian();
@@ -2011,7 +1967,6 @@
                 showCustomModal("Rekap Berhasil Disalin", "Format Audit Selisih Token Kamar berhasil disalin ke clipboard dan siap ditempel ke Grup WA.", "fa-circle-check", "#10b981");
             });
         }
-        // ===================================================================================================
 
         function applyFilter(type, btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
