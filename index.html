@@ -1325,7 +1325,7 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // Langsung buka kamera real-time untuk token kamar tanpa menampilkan pilihan file/galeri
+        // Buka kamera token tanpa konflik dengan kamera utama
         async function openTokenCamera(kamar) {
             activeKamarTarget = kamar;
             const modal = document.getElementById('modal-kamera-token');
@@ -1334,7 +1334,15 @@
             modal.classList.remove('hidden');
 
             try {
+                // Matikan sementara kamera utama agar tidak bentrok
+                if (videoStream) {
+                    videoStream.getTracks().forEach(t => t.stop());
+                    videoStream = null;
+                }
+
                 if (tokenVideoStream) tokenVideoStream.getTracks().forEach(t => t.stop());
+                
+                // Buka kamera belakang (environment) untuk token
                 tokenVideoStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'environment', width: { ideal: 960 }, height: { ideal: 960 } }, 
                     audio: false 
@@ -1345,6 +1353,7 @@
                 console.error("Gagal membuka kamera:", err);
                 modal.classList.add('hidden');
                 alert("Gagal mengakses kamera perangkat. Pastikan izin kamera telah diaktifkan.");
+                initCamera(); // Nyalakan kembali kamera utama jika gagal
             }
         }
 
@@ -1354,7 +1363,11 @@
                 tokenVideoStream = null;
             }
             document.getElementById('modal-kamera-token').classList.add('hidden');
+            
+            // Nyalakan kembali kamera utama (wajah) setelah modal token ditutup
+            initCamera();
         }
+
 
         function ambilFotoTokenSnapshot() {
             const video = document.getElementById('token-webcam');
