@@ -551,6 +551,11 @@
     </style>
 </head>
 
+    <!-- Native Camera Input Tersembunyi khusus Token untuk WebIntoApp -->
+    <input type="file" id="hidden-token-input" accept="image/*" capture="environment" class="hidden" onchange="handleTokenFileSelected(event)">
+
+    <div id="app-wrapper-container" class="app-container">
+    
         <!-- ==================== FORM LOGIN KARYAWAN ==================== -->
         <div id="login-view" class="card" style="margin-top: auto; margin-bottom: auto;">
             <div style="text-align: center; margin-bottom: 20px;">
