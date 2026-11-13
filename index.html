@@ -569,7 +569,7 @@
         .history-table th { background: #1e293b; color: #94a3b8; font-size: 8.5px; padding: 10px 4px; border-bottom: 1px solid #334155; text-transform: uppercase; }
         .history-table td { padding: 8px 4px; border-bottom: 1px solid #1e293b; font-size: 9.5px; color: #cbd5e1; }
         .td-date { font-weight: 700; color: #fff; white-space: nowrap; font-size: 9px; }
-        .td-photo img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; border: 1px solid #334155; }
+        .td-photo img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; border: 1px solid #334155; cursor: pointer; }
         
         .badge { font-size: 7.5px; font-weight: 700; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-bottom: 2px; }
         .badge.hadir { background: #064e3b; color: #34d399; border: 1px solid #047857; }
@@ -1251,12 +1251,12 @@
         </div>
     </div>
 
-    <!-- MODAL PREVIEW GAMBAR -->
+    <!-- MODAL PREVIEW GAMBAR LENGKAP DENGAN TOMBOL TUTUP -->
     <div id="image-fullscreen-modal" class="image-modal-overlay hidden" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <img id="fullscreen-img-element" src="" alt="Full Preview">
-            <div style="margin-top: 15px;">
-                <button class="btn" onclick="closeImageModal()" style="background: #ef4444; width: auto; padding: 8px 20px;">Tutup</button>
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="closeImageModal()" style="background: #ef4444; width: 100%; max-width: 180px; padding: 12px 24px; font-weight: 700; border-radius: 14px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">Tutup</button>
             </div>
         </div>
     </div>
@@ -2207,11 +2207,14 @@
                 let outStatus = item.statusOut || "-";
                 let outClass = outStatus.toUpperCase().includes("TIDAK ABSEN") ? "tidak-absen" : "tepat-waktu";
 
+                let fotoInUrl = getDriveDirectUrl(item.foto);
+                let fotoOutUrl = getDriveDirectUrl(item.fotoPulang);
+
                 tBody.innerHTML += `
                     <tr>
                         <td class="td-date">${item.tanggalDisplay}</td>
-                        <td style="text-align: center;" class="td-photo">${getDriveDirectUrl(item.foto) ? `<a href="${getDriveDirectUrl(item.foto)}" target="_blank"><img src="${getDriveDirectUrl(item.foto)}"></a>` : '-'}</td>
-                        <td style="text-align: center;" class="td-photo">${getDriveDirectUrl(item.fotoPulang) ? `<a href="${getDriveDirectUrl(item.fotoPulang)}" target="_blank"><img src="${getDriveDirectUrl(item.fotoPulang)}"></a>` : '-'}</td>
+                        <td style="text-align: center;" class="td-photo">${fotoInUrl ? `<img src="${fotoInUrl}" onclick="openFullscreenImage('${fotoInUrl}')">` : '-'}</td>
+                        <td style="text-align: center;" class="td-photo">${fotoOutUrl ? `<img src="${fotoOutUrl}" onclick="openFullscreenImage('${fotoOutUrl}')">` : '-'}</td>
                         <td><span class="badge ${inClass}">${inStatus}</span><div class="td-time">In: ${formatTimeOnly(item.masuk)}</div></td>
                         <td><span class="badge ${outClass}">${outStatus}</span><div class="td-time">Out: ${formatTimeOnly(item.pulang)}</div></td>
                     </tr>
