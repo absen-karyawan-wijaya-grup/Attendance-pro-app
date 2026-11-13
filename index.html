@@ -230,6 +230,44 @@
             100% { top: 0%; opacity: 0.3; }
         }
 
+        /* Styling Titik-titik Laser / Facial Landmark Overlay */
+        .face-laser-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .laser-grid {
+            position: relative;
+            width: 120px;
+            height: 150px;
+            border: 1.5px dashed rgba(56, 189, 248, 0.6);
+            border-radius: 50% / 60%;
+            box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .laser-dot {
+            position: absolute;
+            width: 3.5px;
+            height: 3.5px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #38bdf8, 0 0 10px #ffffff;
+            animation: pulseDot 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseDot {
+            0% { opacity: 0.4; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.3); }
+        }
+
         .gps-status-badge {
             margin-top: -14px;
             z-index: 20;
@@ -631,17 +669,33 @@
                     <div class="clock-date" id="live-date">Hari, 00 Bulan 2026</div>
                 </div>
 
-                <!-- FACE SCAN CONTAINER DENGAN IKON SILUET ORANG SEBELUM FOTO TOKEN LENGKAP -->
+                <!-- FACE SCAN CONTAINER -->
                 <div class="face-scan-wrapper">
                     <div class="circular-camera-container">
                         <div class="circular-camera-inner">
-                            <!-- Video Webcam (Disembunyikan sebelum 4 token lengkap) -->
+                            <!-- Video Webcam (Aktif setelah 4 token lengkap) -->
                             <video id="webcam" class="hidden" autoplay playsinline muted></video>
                             
-                            <!-- Placeholder Siluet / Ikon Orang Setengah Badan -->
-                            <div id="webcam-placeholder-siluet" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #090f22; color: #64748b;">
-                                <i class="fa-solid fa-user-gear" style="font-size: 48px; color: #38bdf8; margin-bottom: 6px; opacity: 0.8;"></i>
-                                <span style="font-size: 9px; color: #94a3b8; text-align: center; padding: 0 10px; font-weight: 500;">Selesaikan foto 4 token dulu</span>
+                            <!-- Placeholder Siluet Professional (Seperti Foto Kedua) -->
+                            <div id="webcam-placeholder-siluet" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #060a17; position: relative; overflow: hidden;">
+                                <svg viewBox="0 0 24 24" style="width: 120px; height: 120px; fill: #38bdf8; opacity: 0.85; margin-bottom: 2px;" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C9.24 2 7 4.24 7 7c0 2.22 1.48 4.1 3.5 4.74C8.42 12.56 7 14.58 7 17c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.42-1.42-4.44-3.5-5.26C15.52 11.1 17 9.22 17 7c0-2.76-2.24-5-5-5zm0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 13c-2.33 0-4.2-1.42-4.83-3.37C8.16 12.87 9.98 12 12 12s3.84.87 4.83 1.63C16.2 15.58 14.33 17 12 17z"/>
+                                </svg>
+                                <span style="font-size: 8.5px; color: #94a3b8; text-align: center; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">Selesaikan 4 Foto Token</span>
+                            </div>
+
+                            <!-- Overlay Panduan Wajah & Titik Laser (Seperti Foto Ketiga) -->
+                            <div id="face-laser-guide" class="face-laser-overlay hidden">
+                                <div class="laser-grid">
+                                    <div class="laser-dot" style="top: 22%; left: 35%;"></div>
+                                    <div class="laser-dot" style="top: 22%; right: 35%;"></div>
+                                    <div class="laser-dot" style="top: 35%; left: 28%;"></div>
+                                    <div class="laser-dot" style="top: 35%; right: 28%;"></div>
+                                    <div class="laser-dot" style="top: 48%; left: 48%;"></div>
+                                    <div class="laser-dot" style="top: 58%; left: 38%;"></div>
+                                    <div class="laser-dot" style="top: 58%; right: 38%;"></div>
+                                    <div class="laser-dot" style="top: 68%; left: 45%;"></div>
+                                </div>
                             </div>
 
                             <div id="camera-fallback" class="camera-fallback-overlay hidden">
@@ -649,7 +703,7 @@
                                 <p style="font-size: 10px; color: #cbd5e1; margin-bottom: 8px;">Ketuk untuk aktifkan kamera</p>
                                 <button class="btn" style="padding: 6px 12px; font-size: 10px; width: auto;" onclick="requestCameraExplicitly()">Izinkan Kamera</button>
                             </div>
-                            <div class="scan-line"></div>
+                            <div id="scan-line-element" class="scan-line hidden"></div>
                         </div>
                     </div>
                     <div id="gps-status-badge" class="gps-status-badge">
@@ -1271,7 +1325,6 @@
             if (savedUser) { 
                 showMainApp(savedUser); 
             } else {
-                // Di awal sebelum login, biarkan siluet/ikon tampil (jangan jalankan kamera depan dulu)
                 updateWebcamStateByTokens();
             }
         });
@@ -1348,28 +1401,30 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // CEK APAKAH SEMUA TOKEN SUDAH LENGKAP (14B, 15, 16, 19)
         function areAllTokensComplete() {
             return (tokenPhotos['14B'] && tokenPhotos['15'] && tokenPhotos['16'] && tokenPhotos['19']);
         }
 
-        // KONTROL AKTIF/MATI WEBCAM BERDASARKAN KELENGKAPAN TOKEN
         function updateWebcamStateByTokens() {
             const webcamEl = document.getElementById('webcam');
             const siluetEl = document.getElementById('webcam-placeholder-siluet');
             const instructionEl = document.getElementById('scan-instruction-label');
+            const laserGuideEl = document.getElementById('face-laser-guide');
+            const scanLineEl = document.getElementById('scan-line-element');
 
             if (areAllTokensComplete()) {
-                // Jika 4 foto token sudah selesai, aktifkan kamera depan absen wajah!
                 if (siluetEl) siluetEl.classList.add('hidden');
                 if (webcamEl) webcamEl.classList.remove('hidden');
-                if (instructionEl) instructionEl.innerText = "Scanning... Silahkan lakukan presensi wajah";
+                if (laserGuideEl) laserGuideEl.classList.remove('hidden');
+                if (scanLineEl) scanLineEl.classList.remove('hidden');
+                if (instructionEl) instructionEl.innerText = "Scanning... Posisikan wajah di dalam panduan";
                 if (!videoStream) {
                     initCamera();
                 }
             } else {
-                // Jika belum lengkap, matikan kamera depan dan tampilkan siluet
                 if (webcamEl) webcamEl.classList.add('hidden');
+                if (laserGuideEl) laserGuideEl.classList.add('hidden');
+                if (scanLineEl) scanLineEl.classList.add('hidden');
                 if (siluetEl) siluetEl.classList.remove('hidden');
                 if (instructionEl) instructionEl.innerText = "Lengkapi 4 foto token listrik terlebih dahulu";
                 if (videoStream) {
@@ -1379,7 +1434,6 @@
             }
         }
 
-        // BUKA KAMERA TOKEN (Kamera absen depan sudah dalam keadaan mati / tidak konflik)
         async function openTokenCameraDirect(kamar) {
             activeTokenTarget = kamar;
             const modal = document.getElementById('token-camera-modal');
@@ -1447,7 +1501,6 @@
             }
         }
 
-        // MENUTUP KAMERA TOKEN
         function closeTokenCameraDirect() {
             if (tokenVideoStream) {
                 tokenVideoStream.getTracks().forEach(track => track.stop());
@@ -1457,11 +1510,9 @@
             if (video) video.srcObject = null;
             document.getElementById('token-camera-modal').classList.add('hidden');
 
-            // Cek apakah 4 token sudah lengkap. Jika sudah lengkap, aktifkan kamera depan absen.
             updateWebcamStateByTokens();
         }
 
-        // MENJEPRET FOTO TOKEN
         function captureTokenLivePhoto() {
             const video = document.getElementById('token-video-element');
             const canvas = document.getElementById('token-snapshot-canvas');
@@ -1579,7 +1630,6 @@
         }
 
         async function initCamera() {
-            // Hanya aktifkan jika semua token sudah lengkap
             if (!areAllTokensComplete()) return;
 
             const video = document.getElementById('webcam');
