@@ -53,7 +53,7 @@
             min-height: 100vh;
             background: #0f172a;
             position: relative;
-            padding: 20px 20px 90px 20px;
+            padding: 20px 16px 90px 16px; /* Dibuat lebih lega / full */
             display: flex;
             flex-direction: column;
             transition: filter 0.3s ease;
@@ -733,7 +733,7 @@
             </div>
 
             <!-- TAB 2: HR MENU -->
-            <div id="tab-hr" class="tab-content card hidden">
+            <div id="tab-hr" class="tab-content card hidden" style="padding: 12px; border-radius: 16px;">
                 <div id="hr-login-box">
                     <div style="text-align: center; margin-bottom: 16px;">
                         <h3 style="font-size: 16px;">Verifikasi HR / Admin</h3>
@@ -929,21 +929,84 @@
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="token-history-preview-container"></div>
                     </div>
 
-                    <!-- ==================== CARD BARU: AUDIT KAMAR & REKAP SELISIH TOKEN (SHIFT 1) ==================== -->
-                    <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <!-- ==================== CARD FULL: AUDIT SELISIH TOKEN KAMAR ==================== -->
+                    <div class="bg-slate-950/95 border border-slate-800 rounded-2xl p-4 mb-5 space-y-3.5 shadow-xl w-full">
+                        <!-- Header Card -->
+                        <div class="flex justify-between items-start border-b border-slate-800/80 pb-3">
                             <div>
-                                <h3 style="font-size: 13px; color: #38bdf8; font-weight: 700;"><i class="fa-solid fa-calculator"></i> AUDIT KAMAR & REKAP SELISIH TOKEN</h3>
-                                <p style="font-size: 9.5px; color: #94a3b8;">Shift 1 (10:00 - 22:00) | 1 Jam = 0.79 kWh</p>
+                                <h3 class="font-bold text-sm tracking-wide text-slate-100 uppercase">AUDIT SELISIH TOKEN KAMAR</h3>
+                                <p class="text-[10px] text-slate-400 mt-0.5" id="audit-shift-subtitle">Shift 1 (10:00 - 22:00 WIB) • Sesuai Jenis Orderan</p>
                             </div>
-                            <!-- Filter Kalender Kecil -->
-                            <input type="date" id="picker-audit-kamar" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 10px;" onchange="loadAuditKamarData(this.value)">
+                            <input type="date" id="picker-audit-kamar" class="px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-900 text-white text-[10px]" onchange="loadAuditKamarData(this.value)">
                         </div>
-                        <div style="font-size: 10px; color: #10b981; margin-bottom: 12px; font-weight: 600;" id="audit-kamar-date-label">Menampilkan data harian hari ini</div>
 
-                        <div style="display: flex; flex-direction: column; gap: 12px;" id="audit-kamar-list-container">
-                            <!-- Diisi dinamis via JS -->
+                        <!-- Info Reset & Tanggal -->
+                        <div class="flex justify-between items-center text-[10px] bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-800/60">
+                            <span id="audit-kamar-date-label" class="text-emerald-400 font-semibold">Hari ini</span>
+                            <span id="audit-shift-badge" class="text-sky-400 font-semibold">Reset otomatis 00:00</span>
                         </div>
+
+                        <!-- Tabel Daftar Kamar (Full Lebar & Lega) -->
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-12 text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-2">
+                                <span class="col-span-4">KAMAR</span>
+                                <span class="col-span-2 text-center">TAMU</span>
+                                <span class="col-span-6 text-right">RINCIAN JAM & EST.</span>
+                            </div>
+                            <div id="daftar-kamar-audit" class="space-y-2">
+                                <p class="text-slate-500 text-xs text-center py-3">Memuat data kamar...</p>
+                            </div>
+                        </div>
+
+                        <!-- Panel Audit Token Meteran Aktif -->
+                        <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                                <h4 id="title-audit-kamar" class="font-bold text-xs text-sky-400">⚡ Audit Token (Kamar 14B)</h4>
+                                <span id="badge-status-audit" class="bg-emerald-600 text-white text-[9.5px] px-2.5 py-0.5 rounded-md font-semibold">✓ Sesuai Laporan</span>
+                            </div>
+
+                            <!-- Target kWh -->
+                            <div class="flex justify-between items-center text-[11px] bg-slate-950/60 px-3 py-2 rounded-lg border border-slate-800/60">
+                                <span class="text-slate-400" id="label-target-shift">Target kWh Sesuai Jam Orderan:</span>
+                                <strong id="target-kwh-audit" class="text-amber-300 font-bold text-xs">0.00 kWh</strong>
+                            </div>
+
+                            <!-- Input Angka Token -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+                                    <label class="text-[9.5px] font-medium text-slate-400 block mb-1 text-center">Token Pagi</label>
+                                    <input type="number" step="0.01" id="audit-input-pagi" oninput="simpanDanHitungAudit()" placeholder="0,00" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-center text-amber-300 focus:outline-none focus:border-sky-500 font-bold">
+                                </div>
+                                <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+                                    <label class="text-[9.5px] font-medium text-slate-400 block mb-1 text-center">+ Isi Ulang</label>
+                                    <input type="number" step="0.01" id="audit-input-isi" oninput="simpanDanHitungAudit()" placeholder="0,00" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-center text-amber-300 focus:outline-none focus:border-sky-500 font-bold">
+                                </div>
+                                <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
+                                    <label class="text-[9.5px] font-medium text-slate-400 block mb-1 text-center">Token Malam</label>
+                                    <input type="number" step="0.01" id="audit-input-malam" oninput="simpanDanHitungAudit()" placeholder="0,00" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-center text-amber-300 focus:outline-none focus:border-sky-500 font-bold">
+                                </div>
+                            </div>
+
+                            <!-- Rincian Hasil Perhitungan -->
+                            <div class="bg-slate-950/90 p-3 rounded-lg border border-slate-800 text-[11px] space-y-1.5">
+                                <div class="text-slate-500 text-[9.5px] border-b border-slate-900 pb-1">
+                                    Rumus: (Pagi + Isi Ulang) - Malam
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-300">Aktual Terpakai:</span>
+                                    <strong id="hasil-aktual-audit" class="text-amber-300 font-bold text-xs">0.00 kWh</strong>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-300">Selisih Hitung:</span>
+                                    <strong id="hasil-selisih-audit" class="text-amber-300 font-bold text-xs">0.00 kWh</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Salin Rekap WA -->
+                        <button type="button" onclick="salinRekapAuditWA()" class="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl transition-all text-xs flex items-center justify-center gap-2 shadow-md">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> SALIN FORMAT REKAP GRUP WA
+                        </button>
                     </div>
                     <!-- ============================================================================================== -->
 
@@ -1145,7 +1208,7 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGN9C1tPQjNDUtlleUWr3DMy9s_79rmvwcmDyw39cTkPqU_n5Eir9Hzmg-m66PGA0UKg/exec'; // Ganti dengan URL deployment Web App GAS Anda
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGN9C1tPQjNDUtlleUWr3DMy9s_79rmvwcmDyw39cTkPqU_n5Eir9Hzmg-m66PGA0UKg/exec';
 
         const TARGET_LAT = -6.716420;
         const TARGET_LNG = 108.536437;
@@ -1171,13 +1234,15 @@
             '19': null
         };
 
-        // Menyimpan state nilai input audit token manual per kamar
-        let auditTokenInputs = {
-            'Kamar 14B': { pagi: 0, isiUlang: 0, malam: 0 },
-            'Kamar 15': { pagi: 0, isiUlang: 0, malam: 0 },
-            'Kamar 16': { pagi: 0, isiUlang: 0, malam: 0 },
-            'Kamar 19': { pagi: 0, isiUlang: 0, malam: 0 }
+        // State Audit Selisih Token Kamar
+        let auditKamarState = {
+            "Kamar 14B": { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
+            "Kamar 15":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
+            "Kamar 16":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
+            "Kamar 19":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" }
         };
+        let kamarAuditAktif = "Kamar 14B";
+        let currentAuditDateStr = "";
 
         async function callGAS(action, dataObj = null) {
             const formData = new URLSearchParams();
@@ -1197,9 +1262,46 @@
         window.addEventListener('DOMContentLoaded', function() {
             startLiveClock();
             updateNotificationBadge();
+            checkAutoResetAuditHarian();
             const savedUser = localStorage.getItem('app_user_session');
             if (savedUser) { showMainApp(savedUser); } else { initCamera(); }
         });
+
+        function checkAutoResetAuditHarian() {
+            const now = new Date();
+            const todayKey = now.toISOString().split('T')[0];
+            const savedKey = localStorage.getItem('audit_token_date_key');
+
+            if (savedKey !== todayKey) {
+                localStorage.setItem('audit_token_date_key', todayKey);
+                localStorage.removeItem('audit_token_saved_inputs');
+                ["Kamar 14B", "Kamar 15", "Kamar 16", "Kamar 19"].forEach(k => {
+                    auditKamarState[k].pagi = "";
+                    auditKamarState[k].isi = "";
+                    auditKamarState[k].malam = "";
+                });
+            } else {
+                const savedInputs = JSON.parse(localStorage.getItem('audit_token_saved_inputs') || '{}');
+                for (const [k, val] of Object.entries(savedInputs)) {
+                    if (auditKamarState[k]) {
+                        auditKamarState[k].pagi = val.pagi || "";
+                        auditKamarState[k].isi = val.isi || "";
+                        auditKamarState[k].malam = val.malam || "";
+                    }
+                }
+            }
+
+            const jamSekarang = now.getHours();
+            const subEl = document.getElementById('audit-shift-subtitle');
+            const targetLabelEl = document.getElementById('label-target-shift');
+            if (jamSekarang >= 22 || jamSekarang < 10) {
+                if (subEl) subEl.innerText = "Shift 2 (> 22:00 WIB) • Reset 00:00";
+                if (targetLabelEl) targetLabelEl.innerText = "Target kWh Shift 2 (> 22:00):";
+            } else {
+                if (subEl) subEl.innerText = "Shift 1 (10:00 - 22:00 WIB) • Sesuai Jenis Orderan";
+                if (targetLabelEl) targetLabelEl.innerText = "Target kWh Sesuai Jam Orderan:";
+            }
+        }
 
         function startLiveClock() {
             function update() {
@@ -1213,6 +1315,11 @@
                 const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
                 const dateEl = document.getElementById('live-date');
                 if (dateEl) dateEl.innerText = dateStr;
+
+                if (hours === '00' && minutes === '00' && seconds === '00') {
+                    checkAutoResetAuditHarian();
+                    if (isHRAuthenticated) loadAuditKamarData('');
+                }
             }
             update();
             setInterval(update, 1000);
@@ -1725,77 +1832,186 @@
             }
         }
 
-        // --- FUNGSI AUDIT KAMAR & REKAP SELISIH TOKEN (DENGAN INPUT MANUAL TOKEN PAGI, ISI ULANG, MALAM) ---
+        // ==================== FUNGSI AUDIT SELISIH TOKEN KAMAR (SESUAI JENIS ORDERAN / JAM CHECKIN) ====================
         async function loadAuditKamarData(dateStr) {
-            const container = document.getElementById('audit-kamar-list-container');
+            currentAuditDateStr = dateStr;
+            checkAutoResetAuditHarian();
+            const container = document.getElementById('daftar-kamar-audit');
             const label = document.getElementById('audit-kamar-date-label');
-            container.innerHTML = `<p style="color: #64748b; font-size:11px; text-align:center;">Memuat data audit kamar...</p>`;
+            container.innerHTML = `<p class="text-slate-500 text-xs text-center py-3">Memuat data LAPORAN_TAMU...</p>`;
 
             const res = await callGAS('getAuditKamarData', { targetDateStr: dateStr });
             if (res && res.success) {
-                label.innerText = `Menampilkan data tanggal: ${res.displayDate}`;
+                label.innerText = `Tanggal: ${res.displayDate}`;
                 const kamarList = ['Kamar 14B', 'Kamar 15', 'Kamar 16', 'Kamar 19'];
-                
-                let html = '';
+
                 kamarList.forEach(kamarName => {
-                    let dataKamar = res.audit[kamarName] || { count: 0, totalJam: 0, estKwh: 0 };
-                    let inputs = auditTokenInputs[kamarName] || { pagi: 0, isiUlang: 0, malam: 0 };
-                    
-                    // Rumus: Aktual Terpakai = (Token Pagi + Isi Ulang) - Token Malam
-                    let aktualTerpakai = (Number(inputs.pagi) + Number(inputs.isiUlang)) - Number(inputs.malam);
-                    // Selisih = Aktual Terpakai - Target (Est kWh)
-                    let selisih = aktualTerpakai - dataKamar.estKwh;
-                    let isSesuai = Math.abs(selisih) <= 0.5;
+                    let serverData = res.audit[kamarName] || { count: 0, totalJam: 0, estKwh: 0, rincianJamList: null };
+                    auditKamarState[kamarName].jmlTamu = serverData.count || 0;
+                    auditKamarState[kamarName].target = parseFloat(serverData.estKwh) || 0;
 
-                    html += `
-                        <div style="background: #111c3a; border: 1px solid #334155; border-radius: 12px; padding: 12px; margin-bottom: 4px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <div>
-                                    <div style="font-size: 12px; font-weight: 700; color: #fff;">${kamarName}</div>
-                                    <div style="font-size: 10px; color: #38bdf8;">${dataKamar.count} Transaksi (${dataKamar.totalJam} Jam Shift 1)</div>
-                                </div>
-                                <div style="font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 600; background: ${isSesuai ? '#064e3b' : '#7f1d1d'}; color: ${isSesuai ? '#34d399' : '#fca5a5'}; border: 1px solid ${isSesuai ? '#10b981' : '#ef4444'};">
-                                    ${isSesuai ? '✓ Sesuai Laporan' : '⚠ Periksa Selisih'}
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
-                                <div style="background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
-                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Token Pagi</div>
-                                    <input type="number" step="0.01" value="${inputs.pagi}" oninput="updateAuditInput('${kamarName}', 'pagi', this.value)" style="width: 100%; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 11px; padding: 4px; border-radius: 4px; text-align: center;">
-                                </div>
-                                <div style="background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
-                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">+ Isi Ulang</div>
-                                    <input type="number" step="0.01" value="${inputs.isiUlang}" oninput="updateAuditInput('${kamarName}', 'isiUlang', this.value)" style="width: 100%; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 11px; padding: 4px; border-radius: 4px; text-align: center;">
-                                </div>
-                                <div style="background: #0f172a; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
-                                    <div style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">Token Malam</div>
-                                    <input type="number" step="0.01" value="${inputs.malam}" oninput="updateAuditInput('${kamarName}', 'malam', this.value)" style="width: 100%; background: #1e293b; border: 1px solid #475569; color: #fff; font-size: 11px; padding: 4px; border-radius: 4px; text-align: center;">
-                                </div>
-                            </div>
-
-                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #cbd5e1; background: #0f172a; padding: 6px 8px; border-radius: 6px;">
-                                <span>Target: <b style="color: #38bdf8;">${dataKamar.estKwh.toFixed(2)} kWh</b></span>
-                                <span>Aktual: <b style="color: #facc15;">${aktualTerpakai.toFixed(2)} kWh</b></span>
-                                <span>Selisih: <b style="color: ${selisih === 0 ? '#34d399' : '#f87171'};">${selisih > 0 ? '+' : ''}${selisih.toFixed(2)} kWh</b></span>
-                            </div>
-                        </div>
-                    `;
+                    if (serverData.count > 0) {
+                        if (serverData.rincianJamList && Array.isArray(serverData.rincianJamList) && serverData.rincianJamList.length > 0) {
+                            auditKamarState[kamarName].rincian = serverData.rincianJamList.join(", ");
+                        } else {
+                            auditKamarState[kamarName].rincian = `${serverData.totalJam} Jam`;
+                        }
+                    } else {
+                        auditKamarState[kamarName].rincian = "0 Jam (Kosong)";
+                    }
                 });
-                container.innerHTML = html;
+
+                pilihKamarAudit(kamarAuditAktif);
             } else {
-                container.innerHTML = `<p style="color: #ef4444; font-size:11px; text-align:center;">Gagal memuat rekap audit kamar.</p>`;
+                pilihKamarAudit(kamarAuditAktif);
             }
         }
 
-        function updateAuditInput(kamarName, field, value) {
-            if (!auditTokenInputs[kamarName]) {
-                auditTokenInputs[kamarName] = { pagi: 0, isiUlang: 0, malam: 0 };
+        function renderDaftarKamarAudit() {
+            const container = document.getElementById('daftar-kamar-audit');
+            container.innerHTML = "";
+
+            for (const [nama, data] of Object.entries(auditKamarState)) {
+                const isAktif = (nama === kamarAuditAktif);
+                const pagi = parseFloat(data.pagi) || 0;
+                const isi = parseFloat(data.isi) || 0;
+                const malam = parseFloat(data.malam) || 0;
+                const sudahDiisi = (data.pagi !== "" || data.malam !== "");
+                const aktual = (pagi + isi) - malam;
+                const selisih = aktual - data.target;
+
+                let statusLabelHTML = `<span class="text-[9.5px] text-amber-300/80 font-medium">Belum diaudit</span>`;
+                if (sudahDiisi) {
+                    if (selisih > 0.05) {
+                        statusLabelHTML = `<span class="text-[9.5px] text-rose-400 font-bold">⚠ Tidak Sesuai</span>`;
+                    } else if (selisih < -0.05) {
+                        statusLabelHTML = `<span class="text-[9.5px] text-amber-300 font-bold">⚡ Lebih Hemat</span>`;
+                    } else {
+                        statusLabelHTML = `<span class="text-[9.5px] text-emerald-400 font-bold">✓ Sesuai Laporan</span>`;
+                    }
+                }
+
+                const cardClass = isAktif 
+                    ? "border-sky-500/80 bg-sky-950/30 shadow-md shadow-sky-950/20" 
+                    : "border-slate-800/80 bg-slate-900/50 hover:bg-slate-800/50";
+                
+                const badgeKamarClass = isAktif 
+                    ? "text-sky-400 font-bold" 
+                    : "text-slate-200 font-semibold";
+
+                const badgeTamuClass = isAktif
+                    ? "bg-sky-500 text-slate-950 font-black shadow-sm"
+                    : "bg-slate-800 text-slate-300 font-bold";
+
+                const statusEstOrAktual = sudahDiisi 
+                    ? `<span class="text-amber-300 font-bold">Aktual: ${aktual.toFixed(2)} kWh</span>` 
+                    : `<span class="text-amber-300 font-medium">Est: ~${data.target.toFixed(2)} kWh</span>`;
+
+                container.innerHTML += `
+                    <div onclick="pilihKamarAudit('${nama}')" class="cursor-pointer border ${cardClass} p-3 rounded-xl grid grid-cols-12 items-center transition-all duration-200">
+                        <div class="col-span-4 space-y-0.5">
+                            <span class="text-xs ${badgeKamarClass} block">${nama}</span>
+                            <div>${statusLabelHTML}</div>
+                        </div>
+                        <div class="col-span-2 text-center">
+                            <span class="${badgeTamuClass} px-2.5 py-0.5 rounded-md text-[11px] inline-block">${data.jmlTamu}</span>
+                        </div>
+                        <div class="col-span-6 text-right text-[11px] space-y-0.5">
+                            <p class="text-slate-300 font-medium">${data.rincian}</p>
+                            <p>${statusEstOrAktual}</p>
+                        </div>
+                    </div>
+                `;
             }
-            auditTokenInputs[kamarName][field] = parseFloat(value) || 0;
-            // Refresh kalkulasi kecil di card tanpa reload ulang dari server
-            // Bisa langsung re-render atau biarkan user mengetik
         }
+
+        function pilihKamarAudit(nama) {
+            kamarAuditAktif = nama;
+            const data = auditKamarState[nama];
+
+            document.getElementById('title-audit-kamar').innerText = `⚡ Audit Token (${nama})`;
+            document.getElementById('target-kwh-audit').innerText = data.target.toFixed(2) + " kWh";
+
+            document.getElementById('audit-input-pagi').value = data.pagi;
+            document.getElementById('audit-input-isi').value = data.isi;
+            document.getElementById('audit-input-malam').value = data.malam;
+
+            renderDaftarKamarAudit();
+            hitungTampilanAudit();
+        }
+
+        function simpanDanHitungAudit() {
+            auditKamarState[kamarAuditAktif].pagi = document.getElementById('audit-input-pagi').value;
+            auditKamarState[kamarAuditAktif].isi = document.getElementById('audit-input-isi').value;
+            auditKamarState[kamarAuditAktif].malam = document.getElementById('audit-input-malam').value;
+
+            const toSave = {};
+            for (const [k, v] of Object.entries(auditKamarState)) {
+                toSave[k] = { pagi: v.pagi, isi: v.isi, malam: v.malam };
+            }
+            localStorage.setItem('audit_token_saved_inputs', JSON.stringify(toSave));
+
+            renderDaftarKamarAudit();
+            hitungTampilanAudit();
+        }
+
+        function hitungTampilanAudit() {
+            const data = auditKamarState[kamarAuditAktif];
+            const pagi = parseFloat(data.pagi) || 0;
+            const isi = parseFloat(data.isi) || 0;
+            const malam = parseFloat(data.malam) || 0;
+
+            const aktual = (pagi + isi) - malam;
+            const selisih = aktual - data.target;
+
+            document.getElementById('hasil-aktual-audit').innerText = aktual.toFixed(2) + " kWh";
+
+            const elSelisih = document.getElementById('hasil-selisih-audit');
+            const badgeStatus = document.getElementById('badge-status-audit');
+
+            if (selisih > 0.05) {
+                elSelisih.className = "text-rose-400 font-bold text-xs";
+                elSelisih.innerText = `+${selisih.toFixed(2)} kWh (Lebih Boros)`;
+                badgeStatus.className = "bg-rose-600 text-white text-[9.5px] px-2.5 py-0.5 rounded-md font-semibold";
+                badgeStatus.innerText = "⚠ Tidak Sesuai";
+            } else if (selisih < -0.05) {
+                elSelisih.className = "text-amber-300 font-bold text-xs";
+                elSelisih.innerText = `${selisih.toFixed(2)} kWh`;
+                badgeStatus.className = "bg-amber-600 text-white text-[9.5px] px-2.5 py-0.5 rounded-md font-semibold";
+                badgeStatus.innerText = "⚡ Lebih Hemat";
+            } else {
+                elSelisih.className = "text-amber-300 font-bold text-xs";
+                elSelisih.innerText = `${selisih.toFixed(2)} kWh`;
+                badgeStatus.className = "bg-emerald-600 text-white text-[9.5px] px-2.5 py-0.5 rounded-md font-semibold";
+                badgeStatus.innerText = "✓ Sesuai Laporan";
+            }
+        }
+
+        function salinRekapAuditWA() {
+            const tglText = document.getElementById('audit-kamar-date-label').innerText;
+            let teks = `*AUDIT SELISIH TOKEN KAMAR (SHIFT 1)*\n_${tglText}_\n\n`;
+
+            for (const [nama, data] of Object.entries(auditKamarState)) {
+                const pagi = parseFloat(data.pagi) || 0;
+                const isi = parseFloat(data.isi) || 0;
+                const malam = parseFloat(data.malam) || 0;
+                const aktual = (pagi + isi) - malam;
+                const selisih = aktual - data.target;
+                let statusKet = "Sesuai Laporan";
+                if (selisih > 0.05) statusKet = "Tidak Sesuai (Boros)";
+                else if (selisih < -0.05) statusKet = "Lebih Hemat";
+
+                teks += `*${nama}* (Tamu: ${data.jmlTamu} | ${data.rincian})\n`;
+                teks += `• Token: Pagi(${pagi.toFixed(2)}) + Isi(${isi.toFixed(2)}) - Malam(${malam.toFixed(2)})\n`;
+                teks += `• Terpakai: ${aktual.toFixed(2)} kWh (Target: ${data.target.toFixed(2)} kWh)\n`;
+                teks += `• Selisih: ${selisih >= 0 ? '+' : ''}${selisih.toFixed(2)} kWh (${statusKet})\n\n`;
+            }
+
+            navigator.clipboard.writeText(teks.trim()).then(() => {
+                showCustomModal("Rekap Berhasil Disalin", "Format Audit Selisih Token Kamar berhasil disalin ke clipboard dan siap ditempel ke Grup WA.", "fa-circle-check", "#10b981");
+            });
+        }
+        // ===================================================================================================
 
         function applyFilter(type, btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
