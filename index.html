@@ -550,10 +550,8 @@
         .option-card.selected { border-color: #38bdf8; background: #1e293b; }
     </style>
 </head>
-    
-</body>
-    <!-- Native Camera Input Tersembunyi khusus Token untuk WebIntoApp -->
-    <input type="file" id="hidden-token-input" accept="image/*" capture="environment" class="hidden" onchange="handleTokenFileSelected(event)">
+
+<body>
 
     <div id="app-wrapper-container" class="app-container">
         
@@ -662,7 +660,7 @@
                         <i class="fa-solid fa-right-to-bracket"></i> Absen Masuk
                     </button>
                     <button class="btn-absen btn-absen-pulang" onclick="submitAbsen('PULANG')">
-                        <i class="fa-solid fa-right-from-bracket"></i> Absen Pulang
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Absen Pulang
                     </button>
                 </div>
 
@@ -675,47 +673,47 @@
                     <div class="token-grid">
                         <div class="token-item">
                             <h4>Token Kamar 14B</h4>
-                            <div id="box-preview-14b" class="token-preview-box" onclick="openTokenCamera('14B')">
+                            <div id="box-preview-14b" class="token-preview-box" onclick="openTokenCameraDirect('14B')">
                                 <div id="placeholder-14b" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
-                                <img id="preview-img-14b" class="hidden" src="" alt="Token 14B" onclick="openFullscreenImage(this.src)">
+                                <img id="preview-img-14b" class="hidden" src="" alt="Token 14B" onclick="event.stopPropagation(); openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenCamera('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
+                            <button class="btn-token-capture" onclick="openTokenCameraDirect('14B')"><i class="fa-solid fa-camera"></i> Foto 14B</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 15</h4>
-                            <div id="box-preview-15" class="token-preview-box" onclick="openTokenCamera('15')">
+                            <div id="box-preview-15" class="token-preview-box" onclick="openTokenCameraDirect('15')">
                                 <div id="placeholder-15" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
-                                <img id="preview-img-15" class="hidden" src="" alt="Token 15" onclick="openFullscreenImage(this.src)">
+                                <img id="preview-img-15" class="hidden" src="" alt="Token 15" onclick="event.stopPropagation(); openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenCamera('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
+                            <button class="btn-token-capture" onclick="openTokenCameraDirect('15')"><i class="fa-solid fa-camera"></i> Foto 15</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 16</h4>
-                            <div id="box-preview-16" class="token-preview-box" onclick="openTokenCamera('16')">
+                            <div id="box-preview-16" class="token-preview-box" onclick="openTokenCameraDirect('16')">
                                 <div id="placeholder-16" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
-                                <img id="preview-img-16" class="hidden" src="" alt="Token 16" onclick="openFullscreenImage(this.src)">
+                                <img id="preview-img-16" class="hidden" src="" alt="Token 16" onclick="event.stopPropagation(); openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenCamera('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
+                            <button class="btn-token-capture" onclick="openTokenCameraDirect('16')"><i class="fa-solid fa-camera"></i> Foto 16</button>
                         </div>
                         <div class="token-item">
                             <h4>Token Kamar 19</h4>
-                            <div id="box-preview-19" class="token-preview-box" onclick="openTokenCamera('19')">
+                            <div id="box-preview-19" class="token-preview-box" onclick="openTokenCameraDirect('19')">
                                 <div id="placeholder-19" class="token-placeholder-content">
                                     <i class="fa-solid fa-camera-retro"></i>
                                     <span>Ketuk untuk foto</span>
                                 </div>
-                                <img id="preview-img-19" class="hidden" src="" alt="Token 19" onclick="openFullscreenImage(this.src)">
+                                <img id="preview-img-19" class="hidden" src="" alt="Token 19" onclick="event.stopPropagation(); openFullscreenImage(this.src)">
                             </div>
-                            <button class="btn-token-capture" onclick="openTokenCamera('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
+                            <button class="btn-token-capture" onclick="openTokenCameraDirect('19')"><i class="fa-solid fa-camera"></i> Foto 19</button>
                         </div>
                     </div>
                 </div>
@@ -1137,6 +1135,29 @@
         </div>
     </div>
 
+    <!-- MODAL KAMERA TOKEN LANGSUNG (LIVE STREAMING ANTI BLANK) -->
+    <div id="token-camera-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col items-center justify-center p-3">
+        <div class="relative w-full max-w-sm bg-slate-900 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl flex flex-col">
+            <div class="p-3 bg-slate-800 flex justify-between items-center border-b border-slate-700">
+                <h3 id="token-camera-title" class="text-sm font-bold text-white">Kamera Token Listrik</h3>
+                <button onclick="closeTokenCameraDirect()" class="text-gray-400 hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Area Tampilan Video Kamera Token -->
+            <div class="relative w-full aspect-[3/4] bg-black overflow-hidden flex items-center justify-center">
+                <video id="token-video-element" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                <canvas id="token-snapshot-canvas" class="hidden"></canvas>
+            </div>
+            
+            <!-- Tombol Jepret Token -->
+            <div class="p-4 bg-slate-800 flex justify-center border-t border-slate-700">
+                <button onclick="captureTokenLivePhoto()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-full shadow-lg flex items-center gap-2 transition active:scale-95 text-xs">
+                    <i class="fa-solid fa-camera text-base"></i> Jepret Foto Token
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- CUSTOM MODAL POPUP -->
     <div id="custom-modal-popup" class="custom-modal-overlay hidden">
         <div class="custom-modal-box">
@@ -1194,10 +1215,11 @@
         let currentDistance = null;
         let currentAddress = "Kost Andara Wijaya, Cirebon";
         let videoStream = null;
+        let tokenVideoStream = null;
+        let activeTokenTarget = null;
         let globalHistoryData = [];
         let appNotifications = JSON.parse(localStorage.getItem('app_notifications') || '[]');
         let allowForcePulang = false;
-        let activeKamarTarget = null;
         let isAbsenCompleted = false;
 
         let tokenPhotos = {
@@ -1312,74 +1334,111 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // Membuka kamera native sistem langsung tanpa dialog galeri
-        function openTokenCamera(kamar) {
-            activeKamarTarget = kamar;
-            const fileInput = document.getElementById('hidden-token-input');
-            if (fileInput) {
-                fileInput.value = ''; // Reset agar dapat mengambil foto baru
-                fileInput.click();
+        // BUKA KAMERA TOKEN LIVE STREAMING LANGSUNG TANPA GALERI/FILE
+        async function openTokenCameraDirect(kamar) {
+            activeTokenTarget = kamar;
+            const modal = document.getElementById('token-camera-modal');
+            const video = document.getElementById('token-video-element');
+            
+            document.getElementById('token-camera-title').innerText = `Kamera Token - Kamar ${kamar}`;
+            modal.classList.remove('hidden');
+
+            if (tokenVideoStream) {
+                tokenVideoStream.getTracks().forEach(track => track.stop());
+            }
+
+            try {
+                // Utamakan kamera belakang (environment) dengan fallback fleksibel anti layar hitam
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: "environment" },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+
+                tokenVideoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = tokenVideoStream;
+                await video.play().catch(e => console.log("Autoplay token terhalang:", e));
+            } catch (err) {
+                console.warn("Kamera belakang token gagal, mencoba kamera universal...", err);
+                try {
+                    tokenVideoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    video.srcObject = tokenVideoStream;
+                    await video.play();
+                } catch (e) {
+                    alert("Gagal membuka kamera. Pastikan izin kamera sudah diberikan di pengaturan HP Anda.");
+                    closeTokenCameraDirect();
+                }
             }
         }
 
-        // Memproses hasil jepretan foto token dari kamera native
-        function handleTokenFileSelected(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // MENUTUP KAMERA TOKEN
+        function closeTokenCameraDirect() {
+            if (tokenVideoStream) {
+                tokenVideoStream.getTracks().forEach(track => track.stop());
+                tokenVideoStream = null;
+            }
+            const video = document.getElementById('token-video-element');
+            if (video) video.srcObject = null;
+            document.getElementById('token-camera-modal').classList.add('hidden');
+        }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxWidth = 900;
-                    const scale = maxWidth / img.width;
-                    canvas.width = maxWidth;
-                    canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // MENJEPRET FOTO TOKEN LIVE STREAMING
+        function captureTokenLivePhoto() {
+            const video = document.getElementById('token-video-element');
+            const canvas = document.getElementById('token-snapshot-canvas');
 
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-                    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
+            if (!video.videoWidth || !video.videoHeight) {
+                alert("Kamera belum siap, mohon tunggu sebentar.");
+                return;
+            }
 
-                    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-                    ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
-                    ctx.fillStyle = "#38bdf8";
-                    ctx.fillRect(12, canvas.height - 55, 4, 45);
-                    ctx.fillStyle = "#ffffff";
-                    ctx.font = "bold 12px Inter, Arial, sans-serif";
-                    ctx.fillText(`⚡ TOKEN KAMAR ${activeKamarTarget} ${coordsStr}`, 22, canvas.height - 33);
-                    ctx.fillStyle = "#cbd5e1";
-                    ctx.font = "11px Inter, Arial, sans-serif";
-                    ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    tokenPhotos[activeKamarTarget] = compressedDataUrl;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
 
-                    const kamarNum = activeKamarTarget;
-                    const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
-                    const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
-                    const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+            ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(12, canvas.height - 55, 4, 45);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 12px Inter, Arial, sans-serif";
+            ctx.fillText(`⚡ TOKEN KAMAR ${activeTokenTarget} ${coordsStr}`, 22, canvas.height - 33);
+            ctx.fillStyle = "#cbd5e1";
+            ctx.font = "11px Inter, Arial, sans-serif";
+            ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
 
-                    if (boxEl && placeholderEl && imgEl) {
-                        boxEl.classList.add('has-photo');
-                        placeholderEl.classList.add('hidden');
-                        imgEl.src = compressedDataUrl;
-                        imgEl.classList.remove('hidden');
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            tokenPhotos[activeTokenTarget] = compressedDataUrl;
 
-                        if (!boxEl.querySelector('.token-badge-success')) {
-                            const badge = document.createElement('div');
-                            badge.className = 'token-badge-success';
-                            badge.innerHTML = '✓ Selesai';
-                            boxEl.appendChild(badge);
-                        }
-                    }
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+            const kamarNum = activeTokenTarget.toLowerCase();
+            const boxEl = document.getElementById(`box-preview-${kamarNum}`);
+            const placeholderEl = document.getElementById(`placeholder-${kamarNum}`);
+            const imgEl = document.getElementById(`preview-img-${kamarNum}`);
+
+            if (boxEl && placeholderEl && imgEl) {
+                boxEl.classList.add('has-photo');
+                placeholderEl.classList.add('hidden');
+                imgEl.src = compressedDataUrl;
+                imgEl.classList.remove('hidden');
+
+                if (!boxEl.querySelector('.token-badge-success')) {
+                    const badge = document.createElement('div');
+                    badge.className = 'token-badge-success';
+                    badge.innerHTML = '✓ Selesai';
+                    boxEl.appendChild(badge);
+                }
+            }
+
+            closeTokenCameraDirect();
         }
 
         function openFullscreenImage(imgUrl) {
@@ -2101,6 +2160,7 @@
             localStorage.getItem('app_user_session') && localStorage.removeItem('app_user_session');
             lockHRAccess();
             if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
+            if (tokenVideoStream) { tokenVideoStream.getTracks().forEach(track => track.stop()); tokenVideoStream = null; }
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('login-view').classList.remove('hidden');
         }
