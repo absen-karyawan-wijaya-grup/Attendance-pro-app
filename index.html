@@ -555,8 +555,37 @@
         .stat-info .title { font-size: 10px; color: #64748b; }
         .stat-info .value { font-size: 14px; font-weight: 700; color: #fff; }
 
+        /* Styling Kartu Notifikasi Geser (Swipeable Notification Item) */
+        .notif-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ef4444; /* Background merah dengan ikon tong sampah di bawahnya */
+        }
+        .notif-delete-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: #ffffff;
+            font-size: 18px;
+            z-index: 1;
+        }
         .notif-card-item {
-            background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; position: relative; touch-action: pan-y; user-select: none; overflow: hidden; transition: transform 0.2s ease, opacity 0.2s ease;
+            background: #0f172a; 
+            padding: 10px; 
+            border-radius: 8px; 
+            position: relative; 
+            touch-action: pan-y; 
+            user-select: none; 
+            z-index: 2;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
         }
         
         .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
@@ -652,10 +681,13 @@
                 </div>
 
                 <!-- MODAL NOTIFIKASI -->
-                <div id="notif-modal" class="card hidden" style="position: absolute; top: 60px; left: 0; right: 0; z-index: 1000; max-height: 380px; overflow-y: auto; background: #1e293b; border: 1px solid #334155;">
+                <div id="notif-modal" class="card hidden" style="position: absolute; top: 60px; left: 0; right: 0; z-index: 1000; max-height: 420px; overflow-y: auto; background: #1e293b; border: 1px solid #334155;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px;">
                         <h3 style="font-size: 13px; color: #fff;"><i class="fa-solid fa-bell" style="color: #38bdf8;"></i> Riwayat Notifikasi</h3>
-                        <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 16px; color: #94a3b8;" onclick="closeNotifications()"></i>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid fa-trash-can" style="cursor: pointer; font-size: 14px; color: #ef4444;" onclick="clearAllNotifications()" title="Hapus Semua"></i>
+                            <i class="fa-solid fa-xmark" style="cursor: pointer; font-size: 16px; color: #94a3b8;" onclick="closeNotifications()"></i>
+                        </div>
                     </div>
                     <div id="notif-list" style="font-size: 11px; color: #cbd5e1;">
                         <p style="color: #64748b; text-align: center; padding: 10px;">Belum ada notifikasi.</p>
@@ -1608,17 +1640,91 @@
                 return;
             }
             list.innerHTML = appNotifications.map((n, index) => `
-                <div class="notif-card-item" id="notif-item-${index}" 
-                     style="border-left: 4px solid ${n.status.toLowerCase().includes('terlambat') || n.status.toLowerCase().includes('alfa') ? '#ef4444' : '#10b981'};">
-                    <div style="font-weight: bold; color: #fff; display: flex; justify-content: space-between;">
-                        <span>${n.title}</span><span style="font-size: 10px; color: #94a3b8;">${n.date}</span>
+                <div class="notif-wrapper" id="notif-wrapper-${index}">
+                    <div class="notif-delete-bg">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <i class="fa-solid fa-trash-can"></i>
                     </div>
-                    <div style="color: #cbd5e1;">${n.message}</div>
-                    <div style="font-size: 10px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
-                        <span>🕒 Jam: <b>${n.time} WIB</b> | Status: <b>${n.status}</b></span>
+                    <div class="notif-card-item" id="notif-item-${index}" 
+                         style="border-left: 4px solid ${n.status.toLowerCase().includes('terlambat') || n.status.toLowerCase().includes('alfa') ? '#ef4444' : '#10b981'};"
+                         onmousedown="startSwipe(event, ${index})" 
+                         onttouchstart="startSwipe(event, ${index})"
+                         onmousemove="onSwipe(event, ${index})" 
+                         ontouchmove="onSwipe(event, ${index})"
+                         onmouseup="endSwipe(event, ${index})" 
+                         ontouchend="endSwipe(event, ${index})"
+                         onmouseleave="endSwipe(event, ${index})">
+                        <div style="font-weight: bold; color: #fff; display: flex; justify-content: space-between;">
+                            <span>${n.title}</span><span style="font-size: 10px; color: #94a3b8;">${n.date}</span>
+                        </div>
+                        <div style="color: #cbd5e1;">${n.message}</div>
+                        <div style="font-size: 10px; color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                            <span>🕒 Jam: <b>${n.time} WIB</b> | Status: <b>${n.status}</b></span>
+                        </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Variabel untuk interaksi Swipe Hapus Notifikasi
+        let activeSwipeIndex = null;
+        let startX = 0;
+        let currentX = 0;
+        let isSwiping = false;
+
+        function getClientX(e) {
+            return e.touches ? e.touches[0].clientX : e.clientX;
+        }
+
+        function startSwipe(e, index) {
+            activeSwipeIndex = index;
+            startX = getClientX(e);
+            currentX = 0;
+            isSwiping = true;
+        }
+
+        function onSwipe(e, index) {
+            if (!isSwiping || activeSwipeIndex !== index) return;
+            const x = getClientX(e);
+            currentX = x - startX;
+            const item = document.getElementById(`notif-item-${index}`);
+            if (item) {
+                item.style.transition = 'none';
+                item.style.transform = `translateX(${currentX}px)`;
+                item.style.opacity = `${1 - Math.abs(currentX) / 250}`;
+            }
+        }
+
+        function endSwipe(e, index) {
+            if (!isSwiping || activeSwipeIndex !== index) return;
+            isSwiping = false;
+            const item = document.getElementById(`notif-item-${index}`);
+            if (!item) return;
+
+            item.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+            if (Math.abs(currentX) > 100) {
+                // Geser cukup jauh -> Hapus notifikasi
+                item.style.transform = `translateX(${currentX > 0 ? 400 : -400}px)`;
+                item.style.opacity = '0';
+                setTimeout(() => {
+                    appNotifications.splice(index, 1);
+                    localStorage.setItem('app_notifications', JSON.stringify(appNotifications));
+                    updateNotificationBadge();
+                    renderNotificationList();
+                }, 200);
+            } else {
+                // Kembalikan ke posisi semula
+                item.style.transform = 'translateX(0px)';
+                item.style.opacity = '1';
+            }
+            activeSwipeIndex = null;
+        }
+
+        function clearAllNotifications() {
+            appNotifications = [];
+            localStorage.setItem('app_notifications', JSON.stringify(appNotifications));
+            updateNotificationBadge();
+            renderNotificationList();
         }
 
         function closeNotifications() { document.getElementById('notif-modal').classList.add('hidden'); }
