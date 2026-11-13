@@ -420,7 +420,7 @@
 
         .btn-absen:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-absen-masuk { background: #2563eb; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-        .btn-absen-pulang { background: #dc2626; box-shadow: 0 4px 15px (220, 38, 38, 0.3); }
+        .btn-absen-pulang { background: #dc2626; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
 
         .card {
             background: #1e293b;
@@ -1144,9 +1144,9 @@
             <div class="absolute inset-0 border-4 border-dashed border-sky-400/30 rounded-3xl pointer-events-none"></div>
         </div>
         <div class="w-full max-w-sm pb-6 text-center space-y-3">
-            <p class="text-[11px] text-slate-400">Arahkan kamera ke layar meteran token listrik</p>
-            <button onclick="captureTokenFromStream()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs">
-                <i class="fa-solid fa-camera text-sm"></i> Ambil Foto Meteran
+            <p id="token-cam-status-text" class="text-[11px] text-amber-300">Menyiapkan kamera...</p>
+            <button id="btn-capture-token-action" onclick="captureTokenFromStream()" disabled class="w-full bg-slate-700 text-slate-400 font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs cursor-not-allowed transition-all">
+                <i class="fa-solid fa-camera text-sm"></i> Tunggu Kamera Siap...
             </button>
         </div>
     </div>
@@ -1327,40 +1327,51 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // Buka Modal Kamera Belakang Langsung (Bypass File Chooser Android Wrapper)
+        // Buka Modal Kamera Token & pastikan tombol aktif saat video siap
         async function openTokenCameraModal(kamar) {
             activeKamarTarget = kamar;
             document.getElementById('token-modal-title').innerText = `⚡ Foto Token Kamar ${kamar}`;
             const modal = document.getElementById('token-camera-modal');
             const video = document.getElementById('token-webcam');
+            const statusText = document.getElementById('token-cam-status-text');
+            const captureBtn = document.getElementById('btn-capture-token-action');
+            
             modal.classList.remove('hidden');
+            statusText.innerText = "Menyiapkan kamera...";
+            statusText.className = "text-[11px] text-amber-300";
+            captureBtn.disabled = true;
+            captureBtn.className = "w-full bg-slate-700 text-slate-400 font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs cursor-not-allowed transition-all";
+            captureBtn.innerHTML = `<i class="fa-solid fa-camera text-sm"></i> Tunggu Kamera Siap...`;
 
             try {
                 if (tokenVideoStream) {
                     tokenVideoStream.getTracks().forEach(track => track.stop());
                 }
-                // Coba buka kamera belakang (environment)
+                
+                // Minta akses kamera belakang universal
                 tokenVideoStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: 'environment' }, width: { ideal: 960 }, height: { ideal: 960 } },
+                    video: { facingMode: { ideal: 'environment' } },
                     audio: false
                 });
+
+                video.srcObject = tokenVideoStream;
+                video.onloadedmetadata = () => {
+                    video.play().then(() => {
+                        statusText.innerText = "Kamera siap, silakan ambil foto";
+                        statusText.className = "text-[11px] text-emerald-400";
+                        captureBtn.disabled = false;
+                        captureBtn.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs transition-all";
+                        captureBtn.innerHTML = `<i class="fa-solid fa-camera text-sm"></i> Ambil Foto Meteran`;
+                    }).catch(err => {
+                        statusText.innerText = "Gagal memutar video kamera.";
+                        statusText.className = "text-[11px] text-rose-400";
+                    });
+                };
             } catch (err) {
-                try {
-                    // Fallback jika exact environment tidak didukung device
-                    tokenVideoStream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'environment', width: { ideal: 960 }, height: { ideal: 960 } },
-                        audio: false
-                    });
-                } catch (e) {
-                    // Fallback terakhir kamera depan/default
-                    tokenVideoStream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: { ideal: 960 }, height: { ideal: 960 } },
-                        audio: false
-                    });
-                }
+                console.error("Camera error:", err);
+                statusText.innerText = "Izin kamera ditolak / perangkat sibuk.";
+                statusText.className = "text-[11px] text-rose-400";
             }
-            video.srcObject = tokenVideoStream;
-            video.play().catch(e => console.warn(e));
         }
 
         function closeTokenCameraModal() {
@@ -2144,7 +2155,7 @@
         }
 
         function handleLogout() {
-            localStorage.getItem('app_user_session') && localStorage.getItem('app_user_session') !== null && localStorage.removeItem('app_user_session');
+            localStorage.getItem('app_user_session') && localStorage.removeItem('app_user_session');
             lockHRAccess();
             if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); videoStream = null; }
             if (tokenVideoStream) { tokenVideoStream.getTracks().forEach(track => track.stop()); tokenVideoStream = null; }
