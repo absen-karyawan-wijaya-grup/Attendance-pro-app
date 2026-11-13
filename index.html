@@ -553,6 +553,9 @@
 
 <body>
 
+    <!-- Native Camera Input Tersembunyi khusus Token untuk WebIntoApp -->
+    <input type="file" id="hidden-token-input" accept="image/*" capture="environment" class="hidden" onchange="handleTokenFileSelected(event)">
+
     <div id="app-wrapper-container" class="app-container">
 
         <!-- ==================== FORM LOGIN KARYAWAN ==================== -->
@@ -1177,20 +1180,6 @@
         </div>
     </div>
 
-    <!-- MODAL KAMERA KHUSUS TOKEN (LANGSUNG BUKA KAMERA, TANPA PILIHAN FILE/GALERI) -->
-    <div id="modal-kamera-token" class="image-modal-overlay hidden">
-        <div class="image-modal-content" style="background: #0f172a; padding: 20px; border-radius: 16px; border: 2px solid #38bdf8; max-width: 360px; width: 90%; text-align: center;">
-            <h3 id="modal-kamera-title" style="color: #fff; font-size: 14px; margin-bottom: 12px; font-weight: bold;">Ambil Foto Token</h3>
-            <div style="width: 100%; height: 280px; border-radius: 12px; overflow: hidden; background: #000; position: relative; margin-bottom: 15px;">
-                <video id="token-webcam" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn" style="background: #2563eb;" onclick="ambilFotoTokenSnapshot()">Ambil Foto</button>
-                <button class="btn" style="background: #ef4444;" onclick="tutupKameraToken()">Batal</button>
-            </div>
-        </div>
-    </div>
-
     <!-- LOGIKA JAVASCRIPT -->
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGN9C1tPQjNDUtlleUWr3DMy9s_79rmvwcmDyw39cTkPqU_n5Eir9Hzmg-m66PGA0UKg/exec';
@@ -1206,7 +1195,6 @@
         let currentDistance = null;
         let currentAddress = "Kost Andara Wijaya, Cirebon";
         let videoStream = null;
-        let tokenVideoStream = null;
         let globalHistoryData = [];
         let appNotifications = JSON.parse(localStorage.getItem('app_notifications') || '[]');
         let allowForcePulang = false;
@@ -1325,99 +1313,74 @@
 
         function closeCustomModal() { document.getElementById('custom-modal-popup').classList.add('hidden'); }
 
-        // Buka kamera token tanpa konflik dengan kamera utama
-        async function openTokenCamera(kamar) {
+        // Membuka kamera native sistem langsung tanpa dialog galeri
+        function openTokenCamera(kamar) {
             activeKamarTarget = kamar;
-            const modal = document.getElementById('modal-kamera-token');
-            const video = document.getElementById('token-webcam');
-            document.getElementById('modal-kamera-title').innerText = `⚡ Foto Token Kamar ${kamar}`;
-            modal.classList.remove('hidden');
-
-            try {
-                // Matikan sementara kamera utama agar tidak bentrok
-                if (videoStream) {
-                    videoStream.getTracks().forEach(t => t.stop());
-                    videoStream = null;
-                }
-
-                if (tokenVideoStream) tokenVideoStream.getTracks().forEach(t => t.stop());
-                
-                // Buka kamera belakang (environment) untuk token
-                tokenVideoStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment', width: { ideal: 960 }, height: { ideal: 960 } }, 
-                    audio: false 
-                });
-                video.srcObject = tokenVideoStream;
-                video.play();
-            } catch (err) {
-                console.error("Gagal membuka kamera:", err);
-                modal.classList.add('hidden');
-                alert("Gagal mengakses kamera perangkat. Pastikan izin kamera telah diaktifkan.");
-                initCamera(); // Nyalakan kembali kamera utama jika gagal
+            const fileInput = document.getElementById('hidden-token-input');
+            if (fileInput) {
+                fileInput.value = ''; // Reset agar dapat mengambil foto baru
+                fileInput.click();
             }
         }
 
-        function tutupKameraToken() {
-            if (tokenVideoStream) {
-                tokenVideoStream.getTracks().forEach(t => t.stop());
-                tokenVideoStream = null;
-            }
-            document.getElementById('modal-kamera-token').classList.add('hidden');
-            
-            // Nyalakan kembali kamera utama (wajah) setelah modal token ditutup
-            initCamera();
-        }
+        // Memproses hasil jepretan foto token dari kamera native
+        function handleTokenFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxWidth = 900;
+                    const scale = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        function ambilFotoTokenSnapshot() {
-            const video = document.getElementById('token-webcam');
-            if (!video.srcObject) return;
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
 
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 720;
-            canvas.height = video.videoHeight || 720;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+                    ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
+                    ctx.fillStyle = "#38bdf8";
+                    ctx.fillRect(12, canvas.height - 55, 4, 45);
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 12px Inter, Arial, sans-serif";
+                    ctx.fillText(`⚡ TOKEN KAMAR ${activeKamarTarget} ${coordsStr}`, 22, canvas.height - 33);
+                    ctx.fillStyle = "#cbd5e1";
+                    ctx.font = "11px Inter, Arial, sans-serif";
+                    ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
 
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const coordsStr = currentLat && currentLng ? `(${currentLat.toFixed(6)}, ${currentLng.toFixed(6)})` : '';
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    tokenPhotos[activeKamarTarget] = compressedDataUrl;
 
-            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-            ctx.fillRect(12, canvas.height - 55, canvas.width - 24, 45);
-            ctx.fillStyle = "#38bdf8";
-            ctx.fillRect(12, canvas.height - 55, 4, 45);
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 12px Inter, Arial, sans-serif";
-            ctx.fillText(`⚡ TOKEN KAMAR ${activeKamarTarget} ${coordsStr}`, 22, canvas.height - 33);
-            ctx.fillStyle = "#cbd5e1";
-            ctx.font = "11px Inter, Arial, sans-serif";
-            ctx.fillText(`🕒 ${dateStr} - ${timeStr} WIB`, 22, canvas.height - 14);
+                    const kamarNum = activeKamarTarget;
+                    const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
+                    const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
+                    const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
 
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            tokenPhotos[activeKamarTarget] = compressedDataUrl;
+                    if (boxEl && placeholderEl && imgEl) {
+                        boxEl.classList.add('has-photo');
+                        placeholderEl.classList.add('hidden');
+                        imgEl.src = compressedDataUrl;
+                        imgEl.classList.remove('hidden');
 
-            const kamarNum = activeKamarTarget;
-            const boxEl = document.getElementById(`box-preview-${kamarNum.toLowerCase()}`);
-            const placeholderEl = document.getElementById(`placeholder-${kamarNum.toLowerCase()}`);
-            const imgEl = document.getElementById(`preview-img-${kamarNum.toLowerCase()}`);
-
-            if (boxEl && placeholderEl && imgEl) {
-                boxEl.classList.add('has-photo');
-                placeholderEl.classList.add('hidden');
-                imgEl.src = compressedDataUrl;
-                imgEl.classList.remove('hidden');
-
-                if (!boxEl.querySelector('.token-badge-success')) {
-                    const badge = document.createElement('div');
-                    badge.className = 'token-badge-success';
-                    badge.innerHTML = '✓ Selesai';
-                    boxEl.appendChild(badge);
-                }
-            }
-
-            tutupKameraToken();
+                        if (!boxEl.querySelector('.token-badge-success')) {
+                            const badge = document.createElement('div');
+                            badge.className = 'token-badge-success';
+                            badge.innerHTML = '✓ Selesai';
+                            boxEl.appendChild(badge);
+                        }
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function openFullscreenImage(imgUrl) {
