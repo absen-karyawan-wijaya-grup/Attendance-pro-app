@@ -678,7 +678,7 @@
                     </div>
                 </div>
 
-                <!-- MODAL NOTIFIKASI (Tanpa Icon Tong Sampah di Header) -->
+                <!-- MODAL NOTIFIKASI -->
                 <div id="notif-modal" class="card hidden" style="position: absolute; top: 60px; left: 0; right: 0; z-index: 1000; max-height: 420px; overflow-y: auto; background: #1e293b; border: 1px solid #334155;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px;">
                         <h3 style="font-size: 13px; color: #fff;"><i class="fa-solid fa-bell" style="color: #38bdf8;"></i> Riwayat Notifikasi</h3>
@@ -998,7 +998,7 @@
                     <div style="background: #0f172a; border: 1px solid #334155; border-radius: 14px; padding: 15px; margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="font-size: 13px; color: #38bdf8;"><i class="fa-solid fa-bolt"></i> Preview Foto Token Listrik (30 Hari)</h3>
-                            <input type="date" id="picker-token-history" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 10px;" onchange="loadTokenHistoryByDate(this.value)">
+                            <input type="date" id="picker-token-history" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 10px;" onchange="syncAllAuditByDate(this.value)">
                         </div>
                         <p style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;" id="token-history-date-label">Menampilkan data hari ini</p>
                         
@@ -1012,12 +1012,12 @@
                                 <h3 class="font-bold text-sm tracking-wide text-slate-100 uppercase">AUDIT SELISIH TOKEN KAMAR</h3>
                                 <p class="text-[10px] text-slate-400 mt-0.5" id="audit-shift-subtitle">Shift 1 (10:00 - 22:00 WIB) • Sesuai Jenis Orderan</p>
                             </div>
-                            <input type="date" id="picker-audit-kamar" class="px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-900 text-white text-[10px]" onchange="loadAuditKamarData(this.value)">
+                            <input type="date" id="picker-audit-kamar" class="px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-900 text-white text-[10px]" onchange="syncAllAuditByDate(this.value)">
                         </div>
 
                         <div class="flex justify-between items-center text-[10px] bg-slate-900/70 px-3 py-2 rounded-xl border border-slate-800/60">
                             <span id="audit-kamar-date-label" class="text-emerald-400 font-semibold">Hari ini</span>
-                            <span id="audit-shift-badge" class="text-sky-400 font-semibold">Reset otomatis 00:00</span>
+                            <span id="audit-save-status-badge" class="text-sky-400 font-semibold">Tersinkronisasi ke Sheet</span>
                         </div>
 
                         <div class="space-y-2">
@@ -1049,7 +1049,7 @@
                                 </div>
                                 <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
                                     <label class="text-[9.5px] font-medium text-slate-400 block mb-1 text-center">+ Isi Ulang</label>
-                                    <input type="number" step="0.01" id="audit-input-isi" oninput="simpanDanHitungAudit()" placeholder="0,00" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-center text-amber-300 focus:outline-none focus:border-sky-500 font-bold">
+                                    <input type="number" step="0.01" id="audit-input-isi" oninput="simpanDanHitungAudit()" placeholder="0,00" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-center text-emerald-400 focus:outline-none focus:border-sky-500 font-bold">
                                 </div>
                                 <div class="bg-slate-950/70 p-2 rounded-lg border border-slate-800">
                                     <label class="text-[9.5px] font-medium text-slate-400 block mb-1 text-center">Token Malam</label>
@@ -1058,8 +1058,9 @@
                             </div>
 
                             <div class="bg-slate-950/90 p-3 rounded-lg border border-slate-800 text-[11px] space-y-1.5">
-                                <div class="text-slate-500 text-[9.5px] border-b border-slate-900 pb-1">
-                                    Rumus: (Pagi + Isi Ulang) - Malam
+                                <div class="text-slate-500 text-[9.5px] border-b border-slate-900 pb-1 flex justify-between">
+                                    <span>Rumus: (Pagi + Isi Ulang) - Malam</span>
+                                    <span id="auto-isi-info-label" class="text-emerald-400"></span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-slate-300">Aktual Terpakai:</span>
@@ -1214,7 +1215,7 @@
         </div>
     </div>
 
-    <!-- MODAL KAMERA TOKEN LANGSUNG (LIVE STREAMING ANTI BLANK) -->
+    <!-- MODAL KAMERA TOKEN LANGSUNG -->
     <div id="token-camera-modal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col items-center justify-center p-3">
         <div class="relative w-full max-w-sm bg-slate-900 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl flex flex-col">
             <div class="p-3 bg-slate-800 flex justify-between items-center border-b border-slate-700">
@@ -1267,7 +1268,7 @@
         </div>
     </div>
 
-    <!-- MODAL PREVIEW GAMBAR LENGKAP DENGAN TOMBOL TUTUP -->
+    <!-- MODAL PREVIEW GAMBAR LENGKAP -->
     <div id="image-fullscreen-modal" class="image-modal-overlay hidden" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
             <img id="fullscreen-img-element" src="" alt="Full Preview">
@@ -1279,11 +1280,10 @@
 
     <!-- LOGIKA JAVASCRIPT -->
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsy8sL1PgP8iDwSq5CdA_-awOQQRDZ8UnV8GLpiTXSI4Grh26mlUlsZI7mxyu5JnDQZA/exec';
+        const SCRIPT_URL = 'hhttps://script.google.com/macros/s/AKfycbw_xnIQOdU1NWigRJRp5YSoWkfmC9sO7tciFl2t4k919Uoz-E_2F7s2PwQpEaWD3pTBaA/exec';
 
         const TARGET_LAT = -6.722042;
         const TARGET_LNG = 108.536481;
-
         const MAX_ALLOWED_RADIUS = 15.0;
 
         let isHRAuthenticated = false;
@@ -1308,13 +1308,22 @@
         };
 
         let auditKamarState = {
-            "Kamar 14B": { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
-            "Kamar 15":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
-            "Kamar 16":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" },
-            "Kamar 19":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "" }
+            "Kamar 14B": { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "", autoIsi: 0 },
+            "Kamar 15":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "", autoIsi: 0 },
+            "Kamar 16":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "", autoIsi: 0 },
+            "Kamar 19":  { jmlTamu: 0, rincian: "0 Jam (Kosong)", target: 0.00, pagi: "", isi: "", malam: "", autoIsi: 0 }
         };
         let kamarAuditAktif = "Kamar 14B";
         let currentAuditDateStr = "";
+        let saveAuditDebounceTimer = null;
+
+        function getTodayStrWIB() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
         async function callGAS(action, dataObj = null) {
             const formData = new URLSearchParams();
@@ -1334,7 +1343,8 @@
         window.addEventListener('DOMContentLoaded', function() {
             startLiveClock();
             updateNotificationBadge();
-            checkAutoResetAuditHarian();
+            currentAuditDateStr = getTodayStrWIB();
+            updateShiftLabels();
             const savedUser = localStorage.getItem('app_user_session');
             if (savedUser) { 
                 showMainApp(savedUser); 
@@ -1343,38 +1353,16 @@
             }
         });
 
-        function checkAutoResetAuditHarian() {
+        function updateShiftLabels() {
             const now = new Date();
-            const todayKey = now.toISOString().split('T')[0];
-            const savedKey = localStorage.getItem('audit_token_date_key');
-
-            if (savedKey !== todayKey) {
-                localStorage.setItem('audit_token_date_key', todayKey);
-                localStorage.removeItem('audit_token_saved_inputs');
-                ["Kamar 14B", "Kamar 15", "Kamar 16", "Kamar 19"].forEach(k => {
-                    auditKamarState[k].pagi = "";
-                    auditKamarState[k].isi = "";
-                    auditKamarState[k].malam = "";
-                });
-            } else {
-                const savedInputs = JSON.parse(localStorage.getItem('audit_token_saved_inputs') || '{}');
-                for (const [k, val] of Object.entries(savedInputs)) {
-                    if (auditKamarState[k]) {
-                        auditKamarState[k].pagi = val.pagi || "";
-                        auditKamarState[k].isi = val.isi || "";
-                        auditKamarState[k].malam = val.malam || "";
-                    }
-                }
-            }
-
             const jamSekarang = now.getHours();
             const subEl = document.getElementById('audit-shift-subtitle');
             const targetLabelEl = document.getElementById('label-target-shift');
             if (jamSekarang >= 22 || jamSekarang < 10) {
-                if (subEl) subEl.innerText = "Shift 2 (> 22:00 WIB) • Reset 00:00";
+                if (subEl) subEl.innerText = "Shift 2 (> 22:00 WIB) • Tersimpan Permanen per Tanggal";
                 if (targetLabelEl) targetLabelEl.innerText = "Target kWh Shift 2 (> 22:00):";
             } else {
-                if (subEl) subEl.innerText = "Shift 1 (10:00 - 22:00 WIB) • Sesuai Jenis Orderan";
+                if (subEl) subEl.innerText = "Shift 1 (10:00 - 22:00 WIB) • Tersimpan Permanen per Tanggal";
                 if (targetLabelEl) targetLabelEl.innerText = "Target kWh Sesuai Jam Orderan:";
             }
         }
@@ -1393,8 +1381,8 @@
                 if (dateEl) dateEl.innerText = dateStr;
 
                 if (hours === '00' && minutes === '00' && seconds === '00') {
-                    checkAutoResetAuditHarian();
-                    if (isHRAuthenticated) loadAuditKamarData('');
+                    updateShiftLabels();
+                    if (isHRAuthenticated) syncAllAuditByDate(getTodayStrWIB());
                 }
             }
             update();
@@ -1676,9 +1664,7 @@
             currentX = 0;
             isSwiping = true;
             const item = document.getElementById(`notif-item-${index}`);
-            if (item) {
-                item.setPointerCapture(e.pointerId);
-            }
+            if (item) item.setPointerCapture(e.pointerId);
         }
 
         function onSwipe(e, index) {
@@ -1801,7 +1787,16 @@
                 isHRAuthenticated = true;
                 document.getElementById('hr-login-box').classList.add('hidden');
                 document.getElementById('hr-dashboard-box').classList.remove('hidden');
-                loadSlipGaji(); loadHistory31Days(); loadTokenHistoryByDate(''); loadAuditKamarData('');
+                
+                const todayStr = getTodayStrWIB();
+                const pickerToken = document.getElementById('picker-token-history');
+                const pickerAudit = document.getElementById('picker-audit-kamar');
+                if (pickerToken) pickerToken.value = todayStr;
+                if (pickerAudit) pickerAudit.value = todayStr;
+
+                loadSlipGaji(); 
+                loadHistory31Days(); 
+                syncAllAuditByDate(todayStr);
             } else {
                 showStatus('hr-login-status', 'Kredensial Admin HR Salah!', 'error');
             }
@@ -1984,7 +1979,6 @@
                     showStatus('absen-status', res.message, 'success');
                     addNotification(`Absen ${tipe} Berhasil`, `Pencatatan absen ${tipe.toLowerCase()} & token sukses (${res.message}).`, new Date().toLocaleTimeString('id-ID', {hour12: false}), res.message.includes('Terlambat') ? 'Terlambat' : 'Berhasil');
                     
-                    // OTOMATIS BERSIHKAN / RESET FOTO TOKEN SETELAH BERHASIL ABSEN
                     resetTokenUIAndPhotos();
 
                     setTimeout(() => loadHistory31Days(), 1500);
@@ -2049,16 +2043,41 @@
             }
         }
 
-        async function loadTokenHistoryByDate(dateStr) {
+        // --- FUNGSI SINKRONISASI TANGGAL (FOTO TOKEN + AUDIT KAMAR + AUTO ISI ULANG) ---
+        async function syncAllAuditByDate(dateStr) {
+            const targetDate = dateStr || getTodayStrWIB();
+            currentAuditDateStr = targetDate;
+
+            const pickerToken = document.getElementById('picker-token-history');
+            const pickerAudit = document.getElementById('picker-audit-kamar');
+            if (pickerToken && pickerToken.value !== targetDate) pickerToken.value = targetDate;
+            if (pickerAudit && pickerAudit.value !== targetDate) pickerAudit.value = targetDate;
+
+            await Promise.all([
+                loadTokenHistoryAndSavedAudit(targetDate),
+                loadAuditKamarData(targetDate)
+            ]);
+        }
+
+        async function loadTokenHistoryAndSavedAudit(dateStr) {
             const container = document.getElementById('token-history-preview-container');
             const label = document.getElementById('token-history-date-label');
-            container.innerHTML = `<p style="color: #64748b; font-size:11px; text-align:center; grid-column: span 2;">Memuat foto token...</p>`;
+            const saveBadge = document.getElementById('audit-save-status-badge');
+            
+            container.innerHTML = `<p style="color: #64748b; font-size:11px; text-align:center; grid-column: span 2;">Memuat foto & data audit token...</p>`;
+            if (saveBadge) {
+                saveBadge.innerText = "Memuat data Sheet...";
+                saveBadge.className = "text-amber-400 font-semibold";
+            }
             
             const res = await callGAS('getTokenHistoryByDate', { targetDateStr: dateStr });
             if (res && res.success) {
                 label.innerText = `Menampilkan data tanggal: ${res.displayDate}`;
                 const tokens = res.tokens || {};
+                const savedInputs = res.auditInputs || {};
+                const autoIsiUlang = res.autoIsiUlang || {};
                 
+                // Render Foto Token Pagi & Malam
                 let html = '';
                 ['14B', '15', '16', '19'].forEach(kamar => {
                     let item = tokens[kamar] || { pagi: null, malam: null };
@@ -2080,16 +2099,42 @@
                             </div>
                         </div>
                     `;
+
+                    // Sinkronkan Inputan Pagi, Isi Ulang (Otomatis dari Pengeluaran atau Saved), & Malam
+                    const kamarFull = `Kamar ${kamar}`;
+                    const savedForKamar = savedInputs[kamar];
+                    const autoIsiVal = parseFloat(autoIsiUlang[kamar]) || 0;
+
+                    auditKamarState[kamarFull].autoIsi = autoIsiVal;
+
+                    if (savedForKamar) {
+                        auditKamarState[kamarFull].pagi = savedForKamar.tokenPagi !== "" && savedForKamar.tokenPagi !== 0 ? savedForKamar.tokenPagi : "";
+                        // Jika ada isi ulang otomatis dari CATATAN_PENGELUARAN dan belum diinput manual, gunakan nilai otomatis
+                        if (autoIsiVal > 0 && (!savedForKamar.isiUlang || parseFloat(savedForKamar.isiUlang) === 0)) {
+                            auditKamarState[kamarFull].isi = autoIsiVal.toFixed(2);
+                        } else {
+                            auditKamarState[kamarFull].isi = savedForKamar.isiUlang !== "" && savedForKamar.isiUlang !== 0 ? savedForKamar.isiUlang : "";
+                        }
+                        auditKamarState[kamarFull].malam = savedForKamar.tokenMalam !== "" && savedForKamar.tokenMalam !== 0 ? savedForKamar.tokenMalam : "";
+                    } else {
+                        auditKamarState[kamarFull].pagi = "";
+                        auditKamarState[kamarFull].isi = autoIsiVal > 0 ? autoIsiVal.toFixed(2) : "";
+                        auditKamarState[kamarFull].malam = "";
+                    }
                 });
+
                 container.innerHTML = html;
+                if (saveBadge) {
+                    saveBadge.innerText = "✓ Data Sheet Dimuat";
+                    saveBadge.className = "text-sky-400 font-semibold";
+                }
+                pilihKamarAudit(kamarAuditAktif);
             } else {
                 container.innerHTML = `<p style="color: #ef4444; font-size:11px; text-align:center; grid-column: span 2;">Gagal memuat data token.</p>`;
             }
         }
 
         async function loadAuditKamarData(dateStr) {
-            currentAuditDateStr = dateStr;
-            checkAutoResetAuditHarian();
             const container = document.getElementById('daftar-kamar-audit');
             const label = document.getElementById('audit-kamar-date-label');
             container.innerHTML = `<p class="text-slate-500 text-xs text-center py-3">Memuat data LAPORAN_TAMU...</p>`;
@@ -2161,10 +2206,14 @@
                     ? `<span class="text-amber-300 font-bold">Aktual: ${aktual.toFixed(2)} kWh</span>` 
                     : `<span class="text-amber-300 font-medium">Est: ~${data.target.toFixed(2)} kWh</span>`;
 
+                const badgeAutoIsi = (data.autoIsi > 0) 
+                    ? `<span class="text-[8.5px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 px-1.5 py-0.5 rounded ml-1">+${data.autoIsi.toFixed(0)}</span>` 
+                    : "";
+
                 container.innerHTML += `
                     <div onclick="pilihKamarAudit('${nama}')" class="cursor-pointer border ${cardClass} p-3 rounded-xl grid grid-cols-12 items-center transition-all duration-200">
                         <div class="col-span-4 space-y-0.5">
-                            <span class="text-xs ${badgeKamarClass} block">${nama}</span>
+                            <span class="text-xs ${badgeKamarClass} block">${nama}${badgeAutoIsi}</span>
                             <div>${statusLabelHTML}</div>
                         </div>
                         <div class="col-span-2 text-center">
@@ -2190,23 +2239,54 @@
             document.getElementById('audit-input-isi').value = data.isi;
             document.getElementById('audit-input-malam').value = data.malam;
 
+            const autoIsiLabel = document.getElementById('auto-isi-info-label');
+            if (autoIsiLabel) {
+                autoIsiLabel.innerText = data.autoIsi > 0 ? `⚡ Auto Isi Ulang: +${data.autoIsi.toFixed(2)} kWh` : "";
+            }
+
             renderDaftarKamarAudit();
             hitungTampilanAudit();
         }
 
         function simpanDanHitungAudit() {
-            auditKamarState[kamarAuditAktif].pagi = document.getElementById('audit-input-pagi').value;
-            auditKamarState[kamarAuditAktif].isi = document.getElementById('audit-input-isi').value;
-            auditKamarState[kamarAuditAktif].malam = document.getElementById('audit-input-malam').value;
+            const valPagi = document.getElementById('audit-input-pagi').value;
+            const valIsi = document.getElementById('audit-input-isi').value;
+            const valMalam = document.getElementById('audit-input-malam').value;
 
-            const toSave = {};
-            for (const [k, v] of Object.entries(auditKamarState)) {
-                toSave[k] = { pagi: v.pagi, isi: v.isi, malam: v.malam };
-            }
-            localStorage.setItem('audit_token_saved_inputs', JSON.stringify(toSave));
+            auditKamarState[kamarAuditAktif].pagi = valPagi;
+            auditKamarState[kamarAuditAktif].isi = valIsi;
+            auditKamarState[kamarAuditAktif].malam = valMalam;
 
             renderDaftarKamarAudit();
             hitungTampilanAudit();
+
+            // Simpan otomatis ke Google Sheet (AUDIT_TOKEN) dengan jeda 1 detik setelah selesai mengetik
+            const saveBadge = document.getElementById('audit-save-status-badge');
+            if (saveBadge) {
+                saveBadge.innerText = "Menyimpan ke Sheet...";
+                saveBadge.className = "text-amber-400 font-semibold";
+            }
+
+            clearTimeout(saveAuditDebounceTimer);
+            saveAuditDebounceTimer = setTimeout(async () => {
+                const payload = {
+                    targetDateStr: currentAuditDateStr || getTodayStrWIB(),
+                    kamar: kamarAuditAktif,
+                    tokenPagi: parseFloat(valPagi) || 0,
+                    isiUlang: parseFloat(valIsi) || 0,
+                    tokenMalam: parseFloat(valMalam) || 0
+                };
+                const res = await callGAS('saveAuditTokenData', payload);
+                if (saveBadge) {
+                    if (res && res.success) {
+                        saveBadge.innerText = "✓ Tersimpan di Sheet";
+                        saveBadge.className = "text-emerald-400 font-semibold";
+                    } else {
+                        saveBadge.innerText = "⚠ Gagal simpan";
+                        saveBadge.className = "text-rose-400 font-semibold";
+                    }
+                }
+            }, 1000);
         }
 
         function hitungTampilanAudit() {
@@ -2360,14 +2440,14 @@
         function downloadSlipJPG() {
             const element = document.getElementById('slip-pdf-wrapper');
             html2canvas(element, {
-                scale: 3,
+                scale: 1.5,
                 useCORS: true,
                 letterRendering: true,
                 windowWidth: 1000
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `SLIP_GAJI_CV_WIJAYA_GRUP.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                link.href = canvas.toDataURL('image/jpeg', 0.85);
                 link.click();
             }).catch(err => {
                 console.error('Gagal mengunduh gambar:', err);
@@ -2379,13 +2459,13 @@
             showStatus('email-status', 'Menyiapkan gambar untuk dikirim ke email...', 'success');
             const element = document.getElementById('slip-pdf-wrapper');
             html2canvas(element, {
-                scale: 2,
+                scale: 1.5,
                 useCORS: true,
                 letterRendering: true,
                 windowWidth: 1000
             }).then(async function(canvas) {
-                const imgDataUri = canvas.toDataURL('image/jpeg', 1.0);
-                const res = await callGAS('sendSlipGajiEmail', { pdfDataUri: imgDataUri });
+                const imgDataUri = canvas.toDataURL('image/jpeg', 0.85);
+                const res = await callGAS('sendSlipGajiEmail', { htmlContent: `<img src="${imgDataUri}" style="max-width:100%; height:auto;" />` });
                 if (res.success) { showStatus('email-status', res.message, 'success'); }
                 else { showStatus('email-status', res.message, 'error'); }
             }).catch(err => {
